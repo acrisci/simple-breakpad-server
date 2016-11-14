@@ -1,8 +1,6 @@
 nconf = require 'nconf'
 nconf.formats.yaml = require 'nconf-yaml'
 
-console.log process.cwd()
-
 nconf.file 'user', {
   file: "#{process.cwd()}/breakpad-server.yaml", format: nconf.formats.yaml
 }
