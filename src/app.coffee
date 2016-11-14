@@ -25,7 +25,6 @@ methodOverride = require('method-override')
 path = require 'path'
 express = require 'express'
 exphbs = require 'express-handlebars'
-WebHook = require './webhook'
 Crashreport = require './model/crashreport'
 Symfile = require './model/symfile'
 
@@ -48,7 +47,6 @@ Symfile.findAll()
 run = ->
   app = express()
   breakpad = express()
-  webhook = new WebHook
 
   breakpad.set 'views', path.resolve(__dirname, '..', 'views')
   breakpad.engine('handlebars', exphbs({defaultLayout: 'main'}))
@@ -71,12 +69,6 @@ run = ->
       console.log 'warning: error thrown without a message'
 
     res.status(500).send "Bad things happened:<br/> #{err.message || err}"
-
-  breakpad.post '/webhook', (req, res, next) ->
-    webhook.onRequest req
-
-    console.log 'webhook requested', req.body.repository.full_name
-    res.end()
 
   breakpad.post '/crashreports', (req, res, next) ->
     Crashreport.createFromRequest req, (err, record) ->
