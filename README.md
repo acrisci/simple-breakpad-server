@@ -1,6 +1,6 @@
-# mini-breakpad-server
+# simple-breakpad-server
 
-Minimum collecting server for crash reports sent by
+Simple collecting server for crash reports sent by
 [google-breakpad](https://code.google.com/p/google-breakpad/).
 
 
