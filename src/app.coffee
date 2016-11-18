@@ -20,6 +20,7 @@ nconf.defaults
     files: []
     params: []
 
+moment = require 'moment'
 bodyParser = require 'body-parser'
 methodOverride = require('method-override')
 path = require 'path'
@@ -84,15 +85,30 @@ run = ->
       res.render 'index', title: 'Crash Reports', records: records
 
   breakpad.get '/crashreports/:id', (req, res, next) ->
-    Crashreport.findById(req.params.id).then (record) ->
-      if not record?
+    Crashreport.findById(req.params.id).then (report) ->
+      if not report?
         return res.send 404, 'Crash report not found'
-      Crashreport.getStackTrace record, (err, report) ->
+      Crashreport.getStackTrace report, (err, stackwalk) ->
         return next err if err?
+        fields = {}
+        json = report.toJSON()
+        for k,v of json
+          if Buffer.isBuffer(json[k])
+            fields[k] = { path: "/crashreports/#{req.params.id}/#{k}" }
+          else if v instanceof Date
+            fields[k] = moment(v).format('lll')
+          else
+            fields[k] = if v? then v else 'not present'
+
+        delete fields['id']
+        delete fields['updatedAt']
+
         res.render 'view', {
           title: 'Crash Report'
-          report: report
-          fields: crashreportToJson(record)
+          stackwalk: stackwalk
+          product: json.product
+          version: json.version
+          fields: fields
         }
 
   breakpad.get '/crashreports/:id/:filefield', (req, res, next) ->

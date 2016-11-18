@@ -1,8 +1,18 @@
-<h1>Crash Report</h1>
-
+<h1>Crash Report <small>{{product}} v{{version}}</small></h1>
+<hr>
+<dl class="dl-horizontal">
+  {{#each fields}}
+    <dt>{{@key}}</dt>
+    <dd>
+    {{#if this.path}}
+    <a href="{{this.path}}">download</a>
+    {{else}}
+    {{this}}
+    {{/if}}
+    </dd>
+  {{/each}}
+</dl>
+<h2>Stackwalk</h2>
 <pre>
-{{#each fields}}
-{{@key}}: {{this}}
-{{/each}}
-{{report}}
+{{stackwalk}}
 </pre>
