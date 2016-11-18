@@ -1,11 +1,32 @@
 <h1>Crash Reports</h1>
+<hr>
+{{#if records}}
+<table class="table">
 
-<ol>
-    {{#each records}}
-    <li>
-        <a href="/crashreports/{{this.id}}">
-            v{{this.version}} {{this.createdAt}}
-        </a>
-    </li>
+  <tr>
+    <th>Stackwalk</th>
+    {{#each fields}}
+      <th>{{this}}</th>
     {{/each}}
-</ol>
+  </tr>
+
+  {{#each records}}
+    <tr>
+      <td>
+        <a href="/crashreports/{{this.id}}">view</a>
+      </td>
+    {{#each this}}
+      <td>
+        {{#if this.path}}
+          <a href="{{this.path}}">download</a>
+        {{else}}
+        {{this}}
+        {{/if}}
+      </td>
+    {{/each}}
+    </tr>
+  {{/each}}
+</table>
+{{else}}
+  <p>No crash reports</p>
+{{/if}}

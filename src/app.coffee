@@ -29,7 +29,7 @@ exphbs = require 'express-handlebars'
 Crashreport = require './model/crashreport'
 Symfile = require './model/symfile'
 
-crashreportToJson = (crashreport) ->
+crashreportToApiJson = (crashreport) ->
   json = crashreport.toJSON()
 
   for k,v of json
@@ -37,6 +37,19 @@ crashreportToJson = (crashreport) ->
       json[k] = "/crashreports/#{json.id}/#{k}"
 
   json
+
+crashreportToViewJson = (report) ->
+  fields = {}
+  json = report.toJSON()
+  for k,v of json
+    if Buffer.isBuffer(json[k])
+      fields[k] = { path: "/crashreports/#{report.id}/#{k}" }
+    else if v instanceof Date
+      fields[k] = moment(v).format('lll')
+    else
+      fields[k] = if v? then v else 'not present'
+
+  return fields
 
 # initialization: write all symfiles to disk
 Symfile.findAll()
@@ -75,14 +88,21 @@ run = ->
   breakpad.post '/crashreports', (req, res, next) ->
     Crashreport.createFromRequest req, (err, record) ->
       return next err if err?
-      res.json crashreportToJson(record)
+      res.json crashreportToApiJson(record)
 
   breakpad.get '/', (req, res, next) ->
     res.redirect '/crashreports'
 
   breakpad.get '/crashreports', (req, res, next) ->
     Crashreport.findAll(order: 'createdAt DESC').then (records) ->
-      res.render 'index', title: 'Crash Reports', records: records
+      viewReports = records.map(crashreportToViewJson)
+      for r in viewReports
+        delete r['updatedAt']
+      fields = if viewReports.length then Object.keys(viewReports[0]) else []
+      res.render 'index',
+        title: 'Crash Reports'
+        records: viewReports
+        fields: fields
 
   breakpad.get '/crashreports/:id', (req, res, next) ->
     Crashreport.findById(req.params.id).then (report) ->
@@ -90,15 +110,7 @@ run = ->
         return res.send 404, 'Crash report not found'
       Crashreport.getStackTrace report, (err, stackwalk) ->
         return next err if err?
-        fields = {}
-        json = report.toJSON()
-        for k,v of json
-          if Buffer.isBuffer(json[k])
-            fields[k] = { path: "/crashreports/#{req.params.id}/#{k}" }
-          else if v instanceof Date
-            fields[k] = moment(v).format('lll')
-          else
-            fields[k] = if v? then v else 'not present'
+        fields = crashreportToViewJson(report)
 
         delete fields['id']
         delete fields['updatedAt']
@@ -106,8 +118,8 @@ run = ->
         res.render 'view', {
           title: 'Crash Report'
           stackwalk: stackwalk
-          product: json.product
-          version: json.version
+          product: fields.product
+          version: fields.version
           fields: fields
         }
 
