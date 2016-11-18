@@ -1,25 +1,4 @@
-nconf = require 'nconf'
-nconf.formats.yaml = require 'nconf-yaml'
-
-nconf.file 'user', {
-  file: "#{process.cwd()}/breakpad-server.yaml", format: nconf.formats.yaml
-}
-nconf.file 'system', {
-  file: '/etc/breakpad-server.yaml', format: nconf.formats.yaml
-}
-
-nconf.defaults
-  port: process.env.BREAKPAD_PORT || 1127
-  baseUrl: process.env.BASEURL || '/'
-  database:
-    host: 'localhost'
-    dialect: 'sqlite'
-    storage: 'database.sqlite'
-    logging: no
-  customFields:
-    files: []
-    params: []
-
+config = require './config'
 moment = require 'moment'
 bodyParser = require 'body-parser'
 methodOverride = require('method-override')
@@ -69,8 +48,8 @@ run = ->
   breakpad.use bodyParser.urlencoded({extended: true})
   breakpad.use methodOverride()
 
-  baseUrl = nconf.get('baseUrl')
-  port = nconf.get('port')
+  baseUrl = config.get('baseUrl')
+  port = config.get('port')
 
   app.use baseUrl, breakpad
 

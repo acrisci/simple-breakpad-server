@@ -6,13 +6,13 @@ cache = require './cache'
 minidump = require 'minidump'
 Sequelize = require 'sequelize'
 sequelize = require './db'
-nconf = require 'nconf'
+config = require '../config'
 tmp = require 'tmp'
 
 DIST_DIR = 'pool/files/minidump'
 
 # custom fields should have 'files' and 'params'
-customFields = nconf.get('customFields') || {}
+customFields = config.get('customFields') || {}
 
 schema =
   id:

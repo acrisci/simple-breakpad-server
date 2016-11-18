@@ -1,7 +1,7 @@
 Sequelize = require 'sequelize'
-nconf = require 'nconf'
+config = require '../config'
 
-options = nconf.get 'database'
+options = config.get 'database'
 
 sequelize = new Sequelize(options.uri, options.username, options.password, options)
 
