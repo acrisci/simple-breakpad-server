@@ -62,6 +62,7 @@ run = ->
 
   # serve minidumps as files
   breakpad.use '/minidumps', express.static('pool/files/minidump')
+  breakpad.use '/assets', express.static('node_modules/bootstrap/dist/css')
 
   # error handler
   app.use (err, req, res, next) ->
