@@ -123,6 +123,16 @@ run = ->
           fields: fields
         }
 
+  breakpad.get '/crashreports/:id/stackwalk', (req, res, next) ->
+    # give the raw stackwalk
+    Crashreport.findById(req.params.id).then (report) ->
+      if not report?
+        return res.send 404, 'Crash report not found'
+      Crashreport.getStackTrace report, (err, stackwalk) ->
+        return next err if err?
+        res.set('Content-Type', 'text/plain')
+        res.send(stackwalk.toString('utf8'))
+
   breakpad.get '/crashreports/:id/:filefield', (req, res, next) ->
     # download the file for the given id
     Crashreport.findById(req.params.id).then (crashreport) ->
