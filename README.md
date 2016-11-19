@@ -80,6 +80,7 @@ Configuration is done in yaml (or json).
 The configuration path is as follows:
 
 * `$PWD/breakpad-server.yaml`
+* `$HOME/.simple-breakpad-server/breakpad-server.yaml`
 * `/etc/breakpad-server.yaml`
 
 Here is an example configuration:
@@ -124,5 +125,7 @@ Here are some things to do:
 * group and filter crash reports
 * break the cache when new symfiles are added
 * script to create symfiles
+
+## License
 
 This project open source available to you under an [MIT license](https://github.com/acrisci/simple-breakpad-server/blob/master/LICENSE).
