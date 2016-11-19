@@ -5,6 +5,8 @@ methodOverride = require('method-override')
 path = require 'path'
 express = require 'express'
 exphbs = require 'express-handlebars'
+hbsPaginate = require 'handlebars-paginate'
+paginate = require 'express-paginate'
 Crashreport = require './model/crashreport'
 Symfile = require './model/symfile'
 
@@ -45,6 +47,8 @@ run = ->
     defaultLayout: 'main'
     partialsDir: path.resolve(__dirname, '..', 'views')
     layoutsDir: path.resolve(__dirname, '..', 'views', 'layouts')
+    helpers:
+      paginate: hbsPaginate
 
   breakpad.set 'views', path.resolve(__dirname, '..', 'views')
   breakpad.engine('handlebars', hbs.engine)
@@ -65,6 +69,7 @@ run = ->
     if not err.message?
       console.log 'warning: error thrown without a message'
 
+    console.trace err
     res.status(500).send "Bad things happened:<br/> #{err.message || err}"
 
   breakpad.post '/crashreports', (req, res, next) ->
@@ -75,8 +80,22 @@ run = ->
   breakpad.get '/', (req, res, next) ->
     res.redirect '/crashreports'
 
+  breakpad.use paginate.middleware(15, 50)
   breakpad.get '/crashreports', (req, res, next) ->
-    Crashreport.findAll(order: 'createdAt DESC').then (records) ->
+    limit = req.query.limit
+    offset = req.offset
+    page = req.query.page
+
+    findAllQuery =
+      order: 'createdAt DESC'
+      limit: limit
+      offset: offset
+
+    Crashreport.findAndCountAll(findAllQuery).then (q) ->
+      records = q.rows
+      count = q.count
+      pageCount = Math.floor(count / limit)
+
       viewReports = records.map(crashreportToViewJson)
       for r in viewReports
         delete r['updatedAt']
@@ -85,6 +104,9 @@ run = ->
         title: 'Crash Reports'
         records: viewReports
         fields: fields
+        pagination:
+          page: page
+          pageCount: pageCount
 
   breakpad.get '/crashreports/:id', (req, res, next) ->
     Crashreport.findById(req.params.id).then (report) ->

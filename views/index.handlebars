@@ -27,6 +27,47 @@
     </tr>
   {{/each}}
 </table>
+
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+    {{#paginate pagination type="first"}}
+    <li class="page-item{{#if disabled}} disabled{{/if}}">
+      <a class="page-link" href="?page={{n}}" aria-label="First">
+        <span aria-hidden="true">&laquo;</span>
+        <span class="sr-only">First</span>
+      </a>
+    </li>
+    {{/paginate}}
+    {{#paginate pagination type="previous"}}
+    <li class="page-item{{#if disabled}} disabled{{/if}}">
+      <a class="page-link" href="?page={{n}}" aria-label="Previous">
+        <span aria-hidden="true">&lsaquo;</span>
+        <span class="sr-only">Previous</span>
+      </a>
+    </li>
+    {{/paginate}}
+    {{#paginate pagination type="middle" limit="10"}}
+    <li class="page-item"><a class="page-link{{#if disabled}} disabled{{/if}}" href="?page={{n}}">{{n}}</a></li>
+    {{/paginate}}
+    {{#paginate pagination type="next"}}
+    <li class="page-item{{#if disabled}} disabled{{/if}}">
+      <a class="page-link" href="?page={{n}}" aria-label="Next">
+        <span aria-hidden="true">&rsaquo;</span>
+        <span class="sr-only">Next</span>
+      </a>
+    </li>
+    {{/paginate}}
+    {{#paginate pagination type="last"}}
+    <li class="page-item{{#if disabled}} disabled{{/if}}">
+      <a class="page-link" href="?page={{n}}" aria-label="Last">
+        <span aria-hidden="true">&raquo;</span>
+        <span class="sr-only">Last</span>
+      </a>
+    </li>
+    {{/paginate}}
+  </ul>
+</nav>
 {{else}}
   <p>No crash reports</p>
 {{/if}}
+
