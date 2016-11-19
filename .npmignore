@@ -4,3 +4,4 @@
 *.swp
 .npmignore
 .gitignore
+/devscripts
