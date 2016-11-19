@@ -1,7 +1,7 @@
 {
   "name": "simple-breakpad-server",
   "description": "Simple breakpad crash reports collecting server",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "bin": {
     "simple-breakpad-server": "bin/simple-breakpad-server"
   },
