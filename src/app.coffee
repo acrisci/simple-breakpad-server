@@ -41,8 +41,13 @@ run = ->
   app = express()
   breakpad = express()
 
+  hbs = exphbs.create
+    defaultLayout: 'main'
+    partialsDir: path.resolve(__dirname, '..', 'views')
+    layoutsDir: path.resolve(__dirname, '..', 'views', 'layouts')
+
   breakpad.set 'views', path.resolve(__dirname, '..', 'views')
-  breakpad.engine('handlebars', exphbs({defaultLayout: 'main'}))
+  breakpad.engine('handlebars', hbs.engine)
   breakpad.set 'view engine', 'handlebars'
   breakpad.use bodyParser.json()
   breakpad.use bodyParser.urlencoded({extended: true})
@@ -53,7 +58,7 @@ run = ->
 
   app.use baseUrl, breakpad
 
-  breakpad.use '/assets', express.static('node_modules/bootstrap/dist/css')
+  breakpad.use '/assets', express.static(path.resolve(__dirname, '..', 'node_modules/bootstrap/dist/css'))
 
   # error handler
   app.use (err, req, res, next) ->
