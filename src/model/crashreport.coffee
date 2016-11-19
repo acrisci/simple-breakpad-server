@@ -1,3 +1,4 @@
+config = require '../config'
 path = require 'path'
 formidable = require 'formidable'
 mkdirp = require 'mkdirp'
@@ -6,10 +7,9 @@ cache = require './cache'
 minidump = require 'minidump'
 Sequelize = require 'sequelize'
 sequelize = require './db'
-config = require '../config'
 tmp = require 'tmp'
 
-DIST_DIR = 'pool/files/minidump'
+symbolsPath = config.getSymbolsPath()
 
 # custom fields should have 'files' and 'params'
 customFields = config.get('customFields') || {}
@@ -36,11 +36,9 @@ Crashreport.sync()
 Crashreport.getStackTrace = (record, callback) ->
   return callback(null, cache.get(record.id)) if cache.has record.id
 
-  symbolPaths = [ path.join 'pool', 'symbols' ]
-
   tmpfile = tmp.fileSync()
   fs.writeFile(tmpfile.name, record.upload_file_minidump).then ->
-    minidump.walkStack tmpfile.name, symbolPaths, (err, report) ->
+    minidump.walkStack tmpfile.name, [symbolsPath], (err, report) ->
       tmpfile.removeCallback()
       cache.set record.id, report unless err?
       callback err, report

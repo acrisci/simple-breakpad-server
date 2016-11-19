@@ -1,9 +1,10 @@
+config = require '../config'
 Sequelize = require 'sequelize'
 sequelize = require './db'
 formidable = require 'formidable'
 fs = require 'fs-promise'
 
-DIST_DIR = 'pool/symbols'
+symbolsPath = config.getSymbolsPath()
 COMPOSITE_INDEX = 'compositeIndex'
 
 Symfile = sequelize.define('symfiles', {
@@ -29,7 +30,7 @@ Symfile = sequelize.define('symfiles', {
 Symfile.sync()
 
 Symfile.saveToDisk = (symfile) ->
-  symfileDir = "#{DIST_DIR}/#{symfile.name}/#{symfile.code}"
+  symfileDir = "#{symbolsPath}/#{symfile.name}/#{symfile.code}"
   fs.mkdirs(symfileDir).then ->
     fs.writeFile("#{symfileDir}/#{symfile.name}.sym", symfile.contents)
 

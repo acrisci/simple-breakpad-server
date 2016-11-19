@@ -26,7 +26,7 @@ npm install
 grunt serve
 ```
 
-The server is now running on port 1127. The default database location is `./database.sqlite`.
+The server is now running on port 1127. The default database location is `$HOME/.simple-breakpad-server/database.sqlite`.
 
 ## Endpoints
 
@@ -89,11 +89,12 @@ port: 1127
 baseUrl: '/'
 database:
   dialect: 'sqlite'
-  storage: 'database.sqlite'
-  logging: no
+  storage: '/home/myuser/.simple-breakpad-server/database.sqlite'
+  logging: false
 customFields:
   files: []
   params: []
+dataDir: '/home/myuser/.simple-breakpad-server'
 ```
 
 ### Database configuration
@@ -107,6 +108,10 @@ The `customFields` member has two members. Place a list of file parameters in th
 Custom `files` can be downloaded from the `GET /crashreports/<id>/<file>` endpoint and custom `params` will be shown on the main page for the crash report.
 
 For now, if you change this configuration after the database is initialized, you will have to create the tables on your database manually for things to work.
+
+### Data Directory
+
+Simple breakpad server caches symbols on the disk within the directory specified by `dataDir`. The default location is `$HOME/.simple-breakpad-server`.
 
 ## Contributing
 

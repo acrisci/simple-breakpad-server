@@ -53,8 +53,6 @@ run = ->
 
   app.use baseUrl, breakpad
 
-  # serve minidumps as files
-  breakpad.use '/minidumps', express.static('pool/files/minidump')
   breakpad.use '/assets', express.static('node_modules/bootstrap/dist/css')
 
   # error handler
