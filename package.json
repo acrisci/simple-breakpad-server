@@ -21,9 +21,9 @@
     "moment": "^2.16.0",
     "nconf": "^0.8.4",
     "nconf-yaml": "^1.0.2",
-    "sequelize": "^3.25.0",
+    "sequelize": "^3.27.0",
     "sqlite3": "^3.1.8",
-    "tmp": "0.0.30"
+    "tmp": "^0.0.30"
   },
   "devDependencies": {
     "coffee-script": "^1.11.1",
