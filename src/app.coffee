@@ -9,6 +9,7 @@ hbsPaginate = require 'handlebars-paginate'
 paginate = require 'express-paginate'
 Crashreport = require './model/crashreport'
 Symfile = require './model/symfile'
+db = require './model/db'
 
 crashreportToApiJson = (crashreport) ->
   json = crashreport.toJSON()
@@ -32,12 +33,13 @@ crashreportToViewJson = (report) ->
 
   return fields
 
-# initialization: write all symfiles to disk
-Symfile.findAll()
-  .then (symfiles) ->
-    Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s))).then(run)
-  .catch (err) ->
-    console.log "could not save symfiles to disk: #{err.message}"
+# initialization: init db and write all symfiles to disk
+db.sync().then ->
+  Symfile.findAll()
+    .then (symfiles) ->
+      Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s))).then(run)
+    .catch (err) ->
+      console.log "could not save symfiles to disk: #{err.message}"
 
 run = ->
   app = express()
