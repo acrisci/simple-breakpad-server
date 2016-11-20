@@ -28,7 +28,7 @@ crashreportToViewJson = (report) ->
     if Buffer.isBuffer(json[k])
       fields[k] = { path: "/crashreports/#{report.id}/files/#{k}" }
     else if v instanceof Date
-      fields[k] = moment(v).format('lll')
+      fields[k] = moment(v).fromNow()
     else
       fields[k] = if v? then v else 'not present'
 
