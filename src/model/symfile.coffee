@@ -4,6 +4,7 @@ Sequelize = require 'sequelize'
 sequelize = require './db'
 formidable = require 'formidable'
 fs = require 'fs-promise'
+path = require 'path'
 
 symbolsPath = config.getSymbolsPath()
 COMPOSITE_INDEX = 'compositeIndex'
@@ -29,9 +30,10 @@ Symfile = sequelize.define('symfiles', {
 })
 
 Symfile.saveToDisk = (symfile) ->
-  symfileDir = "#{symbolsPath}/#{symfile.name}/#{symfile.code}"
+  symfileDir = path.join(symbolsPath, symfile.name, symfile.code)
   fs.mkdirs(symfileDir).then ->
-    fs.writeFile("#{symfileDir}/#{symfile.name}.sym", symfile.contents)
+    filePath = path.join(symfileDir, "#{symfile.name}.sym")
+    fs.writeFile(filePath, symfile.contents)
 
 Symfile.createFromRequest = (req, callback) ->
   form = new formidable.IncomingForm()
