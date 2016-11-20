@@ -3,6 +3,6 @@ config = require '../config'
 
 options = config.get 'database'
 
-sequelize = new Sequelize(options.uri, options.username, options.password, options)
+sequelize = new Sequelize(options.database, options.username, options.password, options)
 
 module.exports = sequelize

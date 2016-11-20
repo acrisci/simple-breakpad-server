@@ -89,12 +89,15 @@ Here is an example configuration:
 port: 1127
 baseUrl: '/'
 database:
+  database: 'simple-breakpad-server'
+  username: 'myuser'
+  password: 'secret'
   dialect: 'sqlite'
   storage: '/home/myuser/.simple-breakpad-server/database.sqlite'
   logging: false
 customFields:
-  files: []
-  params: []
+  files: ['customfile']
+  params: ['customparam']
 dataDir: '/home/myuser/.simple-breakpad-server'
 ```
 
