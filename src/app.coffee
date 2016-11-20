@@ -22,15 +22,21 @@ crashreportToApiJson = (crashreport) ->
   json
 
 crashreportToViewJson = (report) ->
-  fields = {}
+  hidden = ['id', 'updated_at']
+  fields =
+    id: report.id
+    props: {}
+
   json = report.toJSON()
   for k,v of json
-    if Buffer.isBuffer(json[k])
-      fields[k] = { path: "/crashreports/#{report.id}/files/#{k}" }
+    if k in hidden
+      # pass
+    else if Buffer.isBuffer(json[k])
+      fields.props[k] = { path: "/crashreports/#{report.id}/files/#{k}" }
     else if v instanceof Date
-      fields[k] = moment(v).fromNow()
+      fields.props[k] = moment(v).fromNow()
     else
-      fields[k] = if v? then v else 'not present'
+      fields.props[k] = if v? then v else 'not present'
 
   return fields
 
@@ -102,9 +108,13 @@ run = ->
       pageCount = Math.floor(count / limit)
 
       viewReports = records.map(crashreportToViewJson)
-      for r in viewReports
-        delete r['updated_at']
-      fields = if viewReports.length then Object.keys(viewReports[0]) else []
+
+      fields =
+        if viewReports.length
+          Object.keys(viewReports[0].props)
+        else
+          []
+
       res.render 'index',
         title: 'Crash Reports'
         records: viewReports
@@ -119,10 +129,7 @@ run = ->
         return res.send 404, 'Crash report not found'
       Crashreport.getStackTrace report, (err, stackwalk) ->
         return next err if err?
-        fields = crashreportToViewJson(report)
-
-        delete fields['id']
-        delete fields['updated_at']
+        fields = crashreportToViewJson(report).props
 
         res.render 'view', {
           title: 'Crash Report'
