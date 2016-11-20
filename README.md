@@ -38,9 +38,9 @@ View a list of crash reports.
 
 View a single crash report.
 
-### `GET /crashreports/<id>/<file>`
+### `GET /crashreports/<id>/files/<file>`
 
-Download a file associated with this crash report. For example, to download the minidump file for a crash report, use `/crashreports/123/upload_file_minidump`.
+Download a file associated with this crash report. For example, to download the minidump file for a crash report, use `/crashreports/123/files/upload_file_minidump`.
 
 ### `POST /crashreports`
 
@@ -109,7 +109,7 @@ Database options are passed directly to [Sequelize](http://docs.sequelizejs.com/
 
 The `customFields` member has two members. Place a list of file parameters in the `files` array. These will be stored in the database as blobs and can contain binary data. Non-files should go into the `params` array. These will be stored in the database encoded as strings.
 
-Custom `files` can be downloaded from the `GET /crashreports/<id>/<file>` endpoint and custom `params` will be shown on the main page for the crash report.
+Custom `files` can be downloaded from the `GET /crashreports/<id>/files/<file>` endpoint and custom `params` will be shown on the main page for the crash report.
 
 For now, if you change this configuration after the database is initialized, you will have to create the tables on your database manually for things to work.
 

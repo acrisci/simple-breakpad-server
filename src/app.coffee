@@ -25,7 +25,7 @@ crashreportToViewJson = (report) ->
   json = report.toJSON()
   for k,v of json
     if Buffer.isBuffer(json[k])
-      fields[k] = { path: "/crashreports/#{report.id}/#{k}" }
+      fields[k] = { path: "/crashreports/#{report.id}/files/#{k}" }
     else if v instanceof Date
       fields[k] = moment(v).format('lll')
     else
@@ -50,6 +50,7 @@ run = ->
     layoutsDir: path.resolve(__dirname, '..', 'views', 'layouts')
     helpers:
       paginate: hbsPaginate
+      reportUrl: (id) -> "/crashreports/#{id}"
 
   breakpad.set 'views', path.resolve(__dirname, '..', 'views')
   breakpad.engine('handlebars', hbs.engine)
@@ -138,7 +139,7 @@ run = ->
         res.set('Content-Type', 'text/plain')
         res.send(stackwalk.toString('utf8'))
 
-  breakpad.get '/crashreports/:id/:filefield', (req, res, next) ->
+  breakpad.get '/crashreports/:id/files/:filefield', (req, res, next) ->
     # download the file for the given id
     Crashreport.findById(req.params.id).then (crashreport) ->
       if not crashreport?
