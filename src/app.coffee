@@ -34,12 +34,11 @@ crashreportToViewJson = (report) ->
   return fields
 
 # initialization: init db and write all symfiles to disk
-db.sync().then ->
-  Symfile.findAll()
-    .then (symfiles) ->
-      Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s))).then(run)
-    .catch (err) ->
-      console.log "could not save symfiles to disk: #{err.message}"
+db.sync().then(->
+  Symfile.findAll().then (symfiles) ->
+    Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s))).then(run)
+).catch (err) ->
+    console.log "got an error: #{err.message}"
 
 run = ->
   app = express()
