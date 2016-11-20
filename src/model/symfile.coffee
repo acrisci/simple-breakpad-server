@@ -1,4 +1,5 @@
 config = require '../config'
+cache = require './cache'
 Sequelize = require 'sequelize'
 sequelize = require './db'
 formidable = require 'formidable'
@@ -67,6 +68,7 @@ Symfile.createFromRequest = (req, callback) ->
             p.then ->
               Symfile.create(props, {transaction: t}).then (symfile) ->
                 Symfile.saveToDisk(symfile).then ->
+                  cache.clear()
                   callback(null, symfile)
 
       .catch (err) ->
