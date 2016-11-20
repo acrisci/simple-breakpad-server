@@ -39,7 +39,8 @@ db.sync().then(->
   Symfile.findAll().then (symfiles) ->
     Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s))).then(run)
 ).catch (err) ->
-    console.log "got an error: #{err.message}"
+    console.error err.stack
+    process.exit 1
 
 run = ->
   app = express()
