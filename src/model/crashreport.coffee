@@ -31,8 +31,6 @@ for field in (customFields.files || [])
 
 Crashreport = sequelize.define('crashreports', schema)
 
-Crashreport.sync()
-
 Crashreport.getStackTrace = (record, callback) ->
   return callback(null, cache.get(record.id)) if cache.has record.id
 

@@ -27,8 +27,6 @@ Symfile = sequelize.define('symfiles', {
   contents: Sequelize.TEXT
 })
 
-Symfile.sync()
-
 Symfile.saveToDisk = (symfile) ->
   symfileDir = "#{symbolsPath}/#{symfile.name}/#{symfile.code}"
   fs.mkdirs(symfileDir).then ->
