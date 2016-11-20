@@ -24,8 +24,8 @@ nconf.argv()
 nconf.env()
 
 nconf.defaults
-  port: process.env.BREAKPAD_PORT || 1127
-  baseUrl: process.env.BASEURL || '/'
+  port: 1127
+  baseUrl: '/'
   database:
     host: 'localhost'
     dialect: 'sqlite'
