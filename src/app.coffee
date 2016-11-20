@@ -89,7 +89,7 @@ run = ->
     page = req.query.page
 
     findAllQuery =
-      order: 'createdAt DESC'
+      order: 'created_at DESC'
       limit: limit
       offset: offset
 
@@ -100,7 +100,7 @@ run = ->
 
       viewReports = records.map(crashreportToViewJson)
       for r in viewReports
-        delete r['updatedAt']
+        delete r['updated_at']
       fields = if viewReports.length then Object.keys(viewReports[0]) else []
       res.render 'index',
         title: 'Crash Reports'
@@ -119,7 +119,7 @@ run = ->
         fields = crashreportToViewJson(report)
 
         delete fields['id']
-        delete fields['updatedAt']
+        delete fields['updated_at']
 
         res.render 'view', {
           title: 'Crash Report'
