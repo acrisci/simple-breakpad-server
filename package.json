@@ -25,6 +25,7 @@
     "nconf-yaml": "^1.0.2",
     "sequelize": "^3.27.0",
     "sqlite3": "^3.1.8",
+    "title-case": "^2.1.0",
     "tmp": "^0.0.30"
   },
   "devDependencies": {

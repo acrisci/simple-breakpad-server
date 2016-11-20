@@ -2,7 +2,7 @@
 <hr>
 <dl class="dl-horizontal">
   {{#each fields}}
-    <dt>{{@key}}</dt>
+    <dt>{{titleCase @key}}</dt>
     <dd>
     {{#if this.path}}
     <a href="{{this.path}}">download</a>

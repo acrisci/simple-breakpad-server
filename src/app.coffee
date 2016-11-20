@@ -10,6 +10,7 @@ paginate = require 'express-paginate'
 Crashreport = require './model/crashreport'
 Symfile = require './model/symfile'
 db = require './model/db'
+titleCase = require 'title-case'
 
 crashreportToApiJson = (crashreport) ->
   json = crashreport.toJSON()
@@ -51,6 +52,7 @@ run = ->
     helpers:
       paginate: hbsPaginate
       reportUrl: (id) -> "/crashreports/#{id}"
+      titleCase: titleCase
 
   breakpad.set 'views', path.resolve(__dirname, '..', 'views')
   breakpad.engine('handlebars', hbs.engine)
