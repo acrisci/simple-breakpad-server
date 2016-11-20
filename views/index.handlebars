@@ -47,7 +47,7 @@
     </li>
     {{/paginate}}
     {{#paginate pagination type="middle" limit="10"}}
-    <li class="page-item"><a class="page-link{{#if disabled}} disabled{{/if}}" href="?page={{n}}">{{n}}</a></li>
+    <li class="page-item{{#if active}} active{{/if}}{{#if disabled}} disabled{{/if}}"><a class="page-link" href="?page={{n}}">{{n}}</a></li>
     {{/paginate}}
     {{#paginate pagination type="next"}}
     <li class="page-item{{#if disabled}} disabled{{/if}}">
