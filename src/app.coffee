@@ -42,6 +42,25 @@ crashreportToViewJson = (report) ->
 
   return fields
 
+symfileToViewJson = (symfile) ->
+  hidden = ['id', 'updated_at', 'contents']
+  fields =
+    id: symfile.id
+    contents: symfile.contents
+    props: {}
+
+  json = symfile.toJSON()
+
+  for k,v of json
+    if k in hidden
+      # pass
+    else if v instanceof Date
+      fields.props[k] = moment(v).fromNow()
+    else
+      fields.props[k] = if v? then v else 'not present'
+
+  return fields
+
 # initialization: init db and write all symfiles to disk
 db.sync()
   .then ->
@@ -62,6 +81,7 @@ run = ->
     helpers:
       paginate: hbsPaginate
       reportUrl: (id) -> "/crashreports/#{id}"
+      symfileUrl: (id) -> "/symfiles/#{id}"
       titleCase: titleCase
 
   breakpad.set 'json spaces', 2
@@ -152,6 +172,38 @@ run = ->
       res.render 'index',
         title: 'Crash Reports'
         records: viewReports
+        fields: fields
+        pagination:
+          page: page
+          pageCount: pageCount
+
+  breakpad.use paginate.middleware(15, 50)
+  breakpad.get '/symfiles', (req, res, next) ->
+    limit = req.query.limit
+    offset = req.offset
+    page = req.query.page
+
+    findAllQuery =
+      order: 'created_at DESC'
+      limit: limit
+      offset: offset
+
+    Symfile.findAndCountAll(findAllQuery).then (q) ->
+      records = q.rows
+      count = q.count
+      pageCount = Math.floor(count / limit)
+
+      viewSymfiles = records.map(symfileToViewJson)
+
+      fields =
+        if viewSymfiles.length
+          Object.keys(viewSymfiles[0].props)
+        else
+          []
+
+      res.render 'symfile-index',
+        title: 'Symfiles'
+        records: viewSymfiles
         fields: fields
         pagination:
           page: page
