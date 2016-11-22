@@ -19,7 +19,7 @@ crashreportToApiJson = (crashreport) ->
 
   for k,v of json
     if Buffer.isBuffer(json[k])
-      json[k] = "/crashreports/#{json.id}/#{k}"
+      json[k] = "/crashreports/#{json.id}/files/#{k}"
 
   json
 
