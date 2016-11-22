@@ -43,10 +43,11 @@ crashreportToViewJson = (report) ->
   return fields
 
 # initialization: init db and write all symfiles to disk
-db.sync().then(->
-  Symfile.findAll().then (symfiles) ->
-    Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s))).then(run)
-).catch (err) ->
+db.sync()
+  .then ->
+    Symfile.findAll().then (symfiles) ->
+      Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s))).then(run)
+  .catch (err) ->
     console.error err.stack
     process.exit 1
 
@@ -75,7 +76,8 @@ run = ->
 
   app.use baseUrl, breakpad
 
-  breakpad.use '/assets', express.static(path.resolve(__dirname, '..', 'node_modules/bootstrap/dist/css'))
+  bsStatic = path.resolve(__dirname, '..', 'node_modules/bootstrap/dist/css')
+  breakpad.use '/assets', express.static(bsStatic)
 
   # error handler
   app.use (err, req, res, next) ->
@@ -193,6 +195,7 @@ run = ->
 
       res.send(contents)
 
+  breakpad.use(busboy())
   breakpad.post '/symfiles', (req, res, next) ->
     Symfile.createFromRequest req, (err, symfile) ->
       return next(err) if err?

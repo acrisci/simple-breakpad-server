@@ -48,7 +48,8 @@ Symfile.createFromRequest = (req, callback) ->
         [dec, os, arch, code, name] = header
 
         if dec != 'MODULE'
-          throw new Error 'Could not parse header (expecting MODULE as first line)'
+          msg = 'Could not parse header (expecting MODULE as first line)'
+          throw new Error msg
 
         props =
           os: os

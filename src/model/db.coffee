@@ -10,6 +10,7 @@ defaultModelOptions =
 
 options.define = Object.assign(options.define, defaultModelOptions)
 
-sequelize = new Sequelize(options.database, options.username, options.password, options)
+sequelize = new Sequelize(options.database, options.username,
+                          options.password, options)
 
 module.exports = sequelize
