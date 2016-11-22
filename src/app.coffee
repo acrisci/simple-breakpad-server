@@ -64,6 +64,7 @@ run = ->
       reportUrl: (id) -> "/crashreports/#{id}"
       titleCase: titleCase
 
+  breakpad.set 'json spaces', 2
   breakpad.set 'views', path.resolve(__dirname, '..', 'views')
   breakpad.engine('handlebars', hbs.engine)
   breakpad.set 'view engine', 'handlebars'
