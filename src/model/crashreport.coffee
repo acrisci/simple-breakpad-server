@@ -1,7 +1,5 @@
 config = require '../config'
 path = require 'path'
-formidable = require 'formidable'
-mkdirp = require 'mkdirp'
 fs = require 'fs-promise'
 cache = require './cache'
 minidump = require 'minidump'

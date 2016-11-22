@@ -1,5 +1,5 @@
-Sequelize = require 'sequelize'
 config = require '../config'
+Sequelize = require 'sequelize'
 
 options = config.get 'database'
 options.define = options.define || {}
