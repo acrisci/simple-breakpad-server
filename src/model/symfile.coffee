@@ -5,6 +5,7 @@ sequelize = require './db'
 formidable = require 'formidable'
 fs = require 'fs-promise'
 path = require 'path'
+streamToArray = require 'stream-to-array'
 
 symbolsPath = config.getSymbolsPath()
 COMPOSITE_INDEX = 'compositeIndex'
@@ -36,45 +37,62 @@ Symfile.saveToDisk = (symfile) ->
     fs.writeFile(filePath, symfile.contents)
 
 Symfile.createFromRequest = (req, callback) ->
-  form = new formidable.IncomingForm()
-  form.parse req, (error, fields, files) ->
-    unless files.symfile?.name?
-      return callback new Error('Invalid symfile upload')
+  props = {}
+  streamOps = []
 
-    fs.readFile(files.symfile.path, encoding: 'utf8')
-      .then (contents) ->
-        header = contents.split('\n')[0].split(/\s+/)
+  req.busboy.on 'file', (fieldname, file, filename, encoding, mimetype) ->
+    streamOps.push streamToArray(file).then((parts) ->
+      buffers = []
+      for i in [0 .. parts.length - 1]
+        part = parts[i]
+        buffers.push if part instanceof Buffer then part else new Buffer(part)
 
-        [dec, os, arch, code, name] = header
+      return Buffer.concat(buffers)
+    ).then (buffer) ->
+      if fieldname == 'symfile'
+        props[fieldname] = buffer.toString()
 
-        if dec != 'MODULE'
-          msg = 'Could not parse header (expecting MODULE as first line)'
-          throw new Error msg
+  req.busboy.on 'finish', ->
+    Promise.all(streamOps).then ->
+      if not 'symfile' of props
+        res.status 400
+        throw new Error 'Form must include a "symfile" field'
 
-        props =
-          os: os
-          arch: arch
-          code: code
-          name: name
-          contents: contents
+      contents = props.symfile
+      header = contents.split('\n')[0].split(/\s+/)
 
-        sequelize.transaction (t) ->
-          whereDuplicated =
-            where: { os: os, arch: arch, code: code, name: name}
+      [dec, os, arch, code, name] = header
 
-          Symfile.findOne(whereDuplicated, {transaction: t}).then (duplicate) ->
-            p =
-              if duplicate?
-                duplicate.destroy({transaction: t})
-              else
-                Promise.resolve()
-            p.then ->
-              Symfile.create(props, {transaction: t}).then (symfile) ->
-                Symfile.saveToDisk(symfile).then ->
-                  cache.clear()
-                  callback(null, symfile)
+      if dec != 'MODULE'
+        msg = 'Could not parse header (expecting MODULE as first line)'
+        throw new Error msg
 
-      .catch (err) ->
-        callback err
+      props =
+        os: os
+        arch: arch
+        code: code
+        name: name
+        contents: contents
+
+      sequelize.transaction (t) ->
+        whereDuplicated =
+          where: { os: os, arch: arch, code: code, name: name}
+
+        Symfile.findOne(whereDuplicated, {transaction: t}).then (duplicate) ->
+          p =
+            if duplicate?
+              duplicate.destroy({transaction: t})
+            else
+              Promise.resolve()
+          p.then ->
+            Symfile.create(props, {transaction: t}).then (symfile) ->
+              Symfile.saveToDisk(symfile).then ->
+                cache.clear()
+                callback(null, symfile)
+
+    .catch (err) ->
+      callback err
+
+  req.pipe(req.busboy)
 
 module.exports = Symfile
