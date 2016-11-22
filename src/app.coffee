@@ -171,6 +171,7 @@ run = ->
 
       res.render 'crashreport-index',
         title: 'Crash Reports'
+        crashreportsActive: yes
         records: viewReports
         fields: fields
         pagination:
@@ -203,6 +204,7 @@ run = ->
 
       res.render 'symfile-index',
         title: 'Symfiles'
+        symfilesActive: yes
         records: viewSymfiles
         fields: fields
         pagination:
