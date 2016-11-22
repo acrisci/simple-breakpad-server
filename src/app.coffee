@@ -169,7 +169,7 @@ run = ->
         else
           []
 
-      res.render 'index',
+      res.render 'crashreport-index',
         title: 'Crash Reports'
         records: viewReports
         fields: fields
@@ -217,7 +217,7 @@ run = ->
         return next err if err?
         fields = crashreportToViewJson(report).props
 
-        res.render 'view', {
+        res.render 'crashreport-view', {
           title: 'Crash Report'
           stackwalk: stackwalk
           product: fields.product
