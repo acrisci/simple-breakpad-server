@@ -44,32 +44,4 @@ Crashreport.getStackTrace = (record, callback) ->
     tmpfile.removeCallback()
     callback err
 
-Crashreport.createFromRequest = (req, callback) ->
-  form = new formidable.IncomingForm()
-  form.parse req, (error, fields, files) ->
-    unless files.upload_file_minidump?.name?
-      return callback new Error('Invalid breakpad upload')
-
-    props = product: fields.prod, version: fields.ver
-
-    for param in customFields.params
-      if param of fields
-        props[param] = fields[param]
-
-    fileOps = []
-    fileParams = customFields.files.concat(['upload_file_minidump'])
-
-    for fileParam in fileParams
-      if fileParam of files
-        p = fs.readFile(files[fileParam].path).then (contents) ->
-          props[fileParam] = contents
-
-        fileOps.push(p)
-
-    Promise.all(fileOps).then( ->
-      Crashreport.create(props).then (crashreport) ->
-        callback(null, crashreport)
-    ).catch (err) ->
-      callback err
-
 module.exports = Crashreport

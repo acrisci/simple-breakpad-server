@@ -11,6 +11,7 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "bootstrap": "^3.3.7",
+    "connect-busboy": "0.0.2",
     "express": "^4.14.0",
     "express-handlebars": "^3.0.0",
     "express-paginate": "^0.2.2",
@@ -25,6 +26,7 @@
     "nconf-yaml": "^1.0.2",
     "sequelize": "^3.27.0",
     "sqlite3": "^3.1.8",
+    "stream-to-array": "^2.3.0",
     "title-case": "^2.1.0",
     "tmp": "^0.0.30"
   },

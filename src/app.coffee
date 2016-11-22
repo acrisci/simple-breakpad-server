@@ -11,6 +11,8 @@ Crashreport = require './model/crashreport'
 Symfile = require './model/symfile'
 db = require './model/db'
 titleCase = require 'title-case'
+busboy = require 'connect-busboy'
+streamToArray = require 'stream-to-array'
 
 crashreportToApiJson = (crashreport) ->
   json = crashreport.toJSON()
@@ -83,10 +85,39 @@ run = ->
     console.trace err
     res.status(500).send "Bad things happened:<br/> #{err.message || err}"
 
+  breakpad.use(busboy())
   breakpad.post '/crashreports', (req, res, next) ->
-    Crashreport.createFromRequest req, (err, record) ->
-      return next err if err?
-      res.json crashreportToApiJson(record)
+    props = {}
+    streamOps = []
+
+    req.busboy.on 'file', (fieldname, file, filename, encoding, mimetype) ->
+      streamOps.push streamToArray(file).then((parts) ->
+        buffers = []
+        for i in [0 .. parts.length - 1]
+          part = parts[i]
+          buffers.push if part instanceof Buffer then part else new Buffer(part)
+
+        return Buffer.concat(buffers)
+      ).then (buffer) ->
+        if fieldname of Crashreport.attributes
+          props[fieldname] = buffer
+
+    req.busboy.on 'field', (fieldname, val, fieldnameTruncated, valTruncated) ->
+      if fieldname == 'prod'
+        props['product'] = val
+      else if fieldname == 'ver'
+        props['version'] = val
+      else if fieldname of Crashreport.attributes
+        props[fieldname] = val.toString()
+
+    req.busboy.on 'finish', ->
+      Promise.all(streamOps).then ->
+        Crashreport.create(props).then (report) ->
+          res.json(crashreportToApiJson(report))
+      .catch (err) ->
+        next err
+
+    req.pipe(req.busboy)
 
   breakpad.get '/', (req, res, next) ->
     res.redirect '/crashreports'
