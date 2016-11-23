@@ -1,0 +1,18 @@
+<div class="page-header">
+  <h1>Symfile <small>{{symfile.props.name}}</h1>
+</div>
+<dl class="dl-horizontal">
+  {{#each symfile.props}}
+    <dt>{{titleCase @key}}</dt>
+    <dd>
+    {{#if this.path}}
+    <a href="{{this.path}}">download</a>
+    {{else}}
+    {{this}}
+    {{/if}}
+    </dd>
+  {{/each}}
+</dl>
+<pre>
+{{symfile.contents}}
+</pre>

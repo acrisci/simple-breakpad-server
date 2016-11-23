@@ -211,6 +211,16 @@ run = ->
           page: page
           pageCount: pageCount
 
+  breakpad.get '/symfiles/:id', (req, res, next) ->
+    Symfile.findById(req.params.id).then (symfile) ->
+      if not symfile?
+        resturn res.send 404, 'Symfile not found'
+
+      res.render 'symfile-view', {
+        title: 'Symfile'
+        symfile: symfileToViewJson(symfile)
+      }
+
   breakpad.get '/crashreports/:id', (req, res, next) ->
     Crashreport.findById(req.params.id).then (report) ->
       if not report?
