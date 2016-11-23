@@ -150,7 +150,7 @@ run = ->
   breakpad.get '/', (req, res, next) ->
     res.redirect '/crashreports'
 
-  breakpad.use paginate.middleware(15, 50)
+  breakpad.use paginate.middleware(10, 50)
   breakpad.get '/crashreports', (req, res, next) ->
     limit = req.query.limit
     offset = req.offset
@@ -172,7 +172,7 @@ run = ->
     Crashreport.findAndCountAll(findAllQuery).then (q) ->
       records = q.rows
       count = q.count
-      pageCount = Math.floor(count / limit)
+      pageCount = Math.ceil(count / limit)
 
       viewReports = records.map(crashreportToViewJson)
 
@@ -188,10 +188,11 @@ run = ->
         records: viewReports
         fields: fields
         pagination:
+          needed: pageCount > 1
           page: page
           pageCount: pageCount
 
-  breakpad.use paginate.middleware(15, 50)
+  breakpad.use paginate.middleware(10, 50)
   breakpad.get '/symfiles', (req, res, next) ->
     limit = req.query.limit
     offset = req.offset
@@ -205,7 +206,7 @@ run = ->
     Symfile.findAndCountAll(findAllQuery).then (q) ->
       records = q.rows
       count = q.count
-      pageCount = Math.floor(count / limit)
+      pageCount = Math.ceil(count / limit)
 
       viewSymfiles = records.map(symfileToViewJson)
 
@@ -221,6 +222,7 @@ run = ->
         records: viewSymfiles
         fields: fields
         pagination:
+          needed: pageCount > 1
           page: page
           pageCount: pageCount
 

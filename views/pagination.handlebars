@@ -1,3 +1,4 @@
+{{#if pagination.needed}}
 <nav aria-label="Page navigation">
   <ul class="pagination">
     {{#paginate pagination type="first"}}
@@ -37,3 +38,4 @@
     {{/paginate}}
   </ul>
 </nav>
+{{/if}}
