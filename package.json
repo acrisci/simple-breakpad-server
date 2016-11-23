@@ -5,6 +5,7 @@
   "bin": {
     "simple-breakpad-server": "bin/simple-breakpad-server"
   },
+  "keywords": ["breakpad", "minidump", "stackwalk", "crashreports"],
   "scripts": {
     "prepublish": "grunt coffee"
   },
