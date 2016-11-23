@@ -40,6 +40,9 @@ crashreportToViewJson = (report) ->
       # pass
     else if Buffer.isBuffer(json[k])
       # already handled
+    else if k == 'created_at'
+      # change the name of this key for display purposes
+      fields.props['created'] = moment(v).fromNow()
     else if v instanceof Date
       fields.props[k] = moment(v).fromNow()
     else
@@ -61,6 +64,9 @@ symfileToViewJson = (symfile) ->
       # pass
     else if v instanceof Date
       fields.props[k] = moment(v).fromNow()
+    else if k == 'created_at'
+      # change the name of this key for display purposes
+      fields.props['created'] = v
     else
       fields.props[k] = if v? then v else 'not present'
 
