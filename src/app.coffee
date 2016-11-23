@@ -62,11 +62,11 @@ symfileToViewJson = (symfile) ->
   for k,v of json
     if k in hidden
       # pass
-    else if v instanceof Date
-      fields.props[k] = moment(v).fromNow()
     else if k == 'created_at'
       # change the name of this key for display purposes
-      fields.props['created'] = v
+      fields.props['created'] = moment(v).fromNow()
+    else if v instanceof Date
+      fields.props[k] = moment(v).fromNow()
     else
       fields.props[k] = if v? then v else 'not present'
 
