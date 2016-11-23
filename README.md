@@ -44,7 +44,7 @@ View a single crash report.
 
 Download a file associated with this crash report. For example, to download the minidump file for a crash report, use `/crashreports/123/files/upload_file_minidump`.
 
-### `GET /symfiles
+### `GET /symfiles`
 
 See a list of available symfiles used to symbolize the crash reports.
 
@@ -136,9 +136,9 @@ Here are some things to do:
 * improve UI
 * endpoint to delete crash reports
 * group and filter crash reports
-* break the cache when new symfiles are added
 * script to create symfiles
+* cli
 
 ## License
 
-This project open source available to you under an [MIT license](https://github.com/acrisci/simple-breakpad-server/blob/master/LICENSE).
+This project is open source and available to you under an [MIT license](https://github.com/acrisci/simple-breakpad-server/blob/master/LICENSE).
