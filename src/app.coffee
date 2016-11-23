@@ -13,6 +13,7 @@ db = require './model/db'
 titleCase = require 'title-case'
 busboy = require 'connect-busboy'
 streamToArray = require 'stream-to-array'
+Sequelize = require 'sequelize'
 
 crashreportToApiJson = (crashreport) ->
   json = crashreport.toJSON()
@@ -29,12 +30,16 @@ crashreportToViewJson = (report) ->
     id: report.id
     props: {}
 
+  for name, value of Crashreport.attributes
+    if value.type instanceof Sequelize.BLOB
+      fields.props[name] = { path: "/crashreports/#{report.id}/files/#{name}" }
+
   json = report.toJSON()
   for k,v of json
     if k in hidden
       # pass
     else if Buffer.isBuffer(json[k])
-      fields.props[k] = { path: "/crashreports/#{report.id}/files/#{k}" }
+      # already handled
     else if v instanceof Date
       fields.props[k] = moment(v).fromNow()
     else
@@ -151,10 +156,18 @@ run = ->
     offset = req.offset
     page = req.query.page
 
+    attributes = []
+
+    # only fetch non-blob attributes to speed up the query
+    for name, value of Crashreport.attributes
+      unless value.type instanceof Sequelize.BLOB
+        attributes.push name
+
     findAllQuery =
       order: 'created_at DESC'
       limit: limit
       offset: offset
+      attributes: attributes
 
     Crashreport.findAndCountAll(findAllQuery).then (q) ->
       records = q.rows

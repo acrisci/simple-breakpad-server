@@ -9,7 +9,7 @@ streamToArray = require 'stream-to-array'
 symbolsPath = config.getSymbolsPath()
 COMPOSITE_INDEX = 'compositeIndex'
 
-Symfile = sequelize.define('symfiles', {
+schema =
   id:
     type: Sequelize.INTEGER
     autoIncrement: yes
@@ -27,7 +27,13 @@ Symfile = sequelize.define('symfiles', {
     type: Sequelize.STRING
     unique: COMPOSITE_INDEX
   contents: Sequelize.TEXT
-})
+
+options =
+  indexes: [
+    { fields: ['created_at'] }
+  ]
+
+Symfile = sequelize.define('symfiles', schema, options)
 
 Symfile.saveToDisk = (symfile) ->
   symfileDir = path.join(symbolsPath, symfile.name, symfile.code)

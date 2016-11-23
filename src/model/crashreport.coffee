@@ -21,13 +21,19 @@ schema =
   version: Sequelize.STRING
   upload_file_minidump: Sequelize.BLOB
 
+
+options =
+  indexes: [
+    { fields: ['created_at'] }
+  ]
+
 for field in (customFields.params || [])
   schema[field] = Sequelize.STRING
 
 for field in (customFields.files || [])
   schema[field] = Sequelize.BLOB
 
-Crashreport = sequelize.define('crashreports', schema)
+Crashreport = sequelize.define('crashreports', schema, options)
 
 Crashreport.getStackTrace = (record, callback) ->
   return callback(null, cache.get(record.id)) if cache.has record.id
