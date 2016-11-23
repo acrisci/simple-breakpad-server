@@ -97,7 +97,7 @@ run = ->
 
   app.use baseUrl, breakpad
 
-  bsStatic = path.resolve(__dirname, '..', 'node_modules/bootstrap/dist/css')
+  bsStatic = path.resolve(__dirname, '..', 'node_modules/bootstrap/dist')
   breakpad.use '/assets', express.static(bsStatic)
 
   # error handler
