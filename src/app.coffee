@@ -194,7 +194,7 @@ run = ->
         records: viewReports
         fields: fields
         pagination:
-          needed: pageCount > 1
+          hide: pageCount <= 1
           page: page
           pageCount: pageCount
 
@@ -228,7 +228,7 @@ run = ->
         records: viewSymfiles
         fields: fields
         pagination:
-          needed: pageCount > 1
+          hide: pageCount <= 1
           page: page
           pageCount: pageCount
 
