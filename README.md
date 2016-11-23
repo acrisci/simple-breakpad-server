@@ -14,7 +14,7 @@ Now simply run `simple-breakpad-server` which should be in your PATH. Navigate t
 
 * Send crash reports to the server from your applications.
 * Display crash report information like minidump stackwalks and application metadata.
-* Supports PostgreSQL, MySQL, MariaDB, SQLite and MSSQL.
+* Supports SQLite, PostgreSQL, MySQL, MariaDB
 * Simple web interface for viewing translated crash reports.
 * Add symbols from the web API.
 
