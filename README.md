@@ -8,6 +8,8 @@ Simple Breakpad Server is a lightweight alternative to [Socorro](https://github.
 
     npm install -g simple-breakpad-server
 
+Now simply run `simple-breakpad-server` which should be in your PATH. Navigate to [localhost:1127](http://localhost:1127) in your browser to see the server.
+
 ## Features
 
 * Send crash reports to the server from your applications.
@@ -41,6 +43,14 @@ View a single crash report.
 ### `GET /crashreports/<id>/files/<file>`
 
 Download a file associated with this crash report. For example, to download the minidump file for a crash report, use `/crashreports/123/files/upload_file_minidump`.
+
+### `GET /symfiles
+
+See a list of available symfiles used to symbolize the crash reports.
+
+### `GET /symfiles/<id>`
+
+See the contents of an individual symfile.
 
 ### `POST /crashreports`
 
