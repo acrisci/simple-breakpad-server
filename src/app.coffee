@@ -229,10 +229,15 @@ run = ->
       if not symfile?
         resturn res.send 404, 'Symfile not found'
 
-      res.render 'symfile-view', {
-        title: 'Symfile'
-        symfile: symfileToViewJson(symfile)
-      }
+      if 'raw' of req.query
+        res.set 'content-type', 'text/plain'
+        res.send(symfile.contents.toString())
+        res.end()
+      else
+        res.render 'symfile-view', {
+          title: 'Symfile'
+          symfile: symfileToViewJson(symfile)
+        }
 
   breakpad.get '/crashreports/:id', (req, res, next) ->
     Crashreport.findById(req.params.id).then (report) ->
