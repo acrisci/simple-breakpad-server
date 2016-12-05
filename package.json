@@ -12,7 +12,8 @@
     "crashreports"
   ],
   "scripts": {
-    "prepublish": "grunt coffee"
+    "prepublish": "grunt coffee",
+    "serve": "grunt serve"
   },
   "dependencies": {
     "body-parser": "^1.15.2",

@@ -23,9 +23,8 @@ Now simply run `simple-breakpad-server` which should be in your PATH. Navigate t
 Simple Breakpad Server uses [Grunt](http://gruntjs.com/) as a task runner.
 
 ```sh
-npm install -g grunt
 npm install
-grunt serve
+npm run-script serve
 ```
 
 The server is now running on port 1127. The default database location is `$HOME/.simple-breakpad-server/database.sqlite`.
