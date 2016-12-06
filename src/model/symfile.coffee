@@ -38,7 +38,15 @@ Symfile = sequelize.define('symfiles', schema, options)
 Symfile.saveToDisk = (symfile) ->
   symfileDir = path.join(symbolsPath, symfile.name, symfile.code)
   fs.mkdirs(symfileDir).then ->
-    filePath = path.join(symfileDir, "#{symfile.name}.sym")
+    # From https://chromium.googlesource.com/breakpad/breakpad/+/master/src/processor/simple_symbol_supplier.cc#179:
+    # Transform the debug file name into one ending in .sym.  If the existing
+    #   name ends in .pdb, strip the .pdb.  Otherwise, add .sym to the non-.pdb
+    #   name.
+    symbol_name = symfile.name
+    if path.extname(symbol_name).toLowerCase() == '.pdb'
+      symbol_name = symbol_name.slice(0, -4)
+    symbol_name += '.sym'
+    filePath = path.join(symfileDir, symbol_name)
     fs.writeFile(filePath, symfile.contents)
 
 Symfile.createFromRequest = (req, callback) ->
