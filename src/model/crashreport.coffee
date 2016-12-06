@@ -19,6 +19,7 @@ schema =
     primaryKey: yes
   product: Sequelize.STRING
   version: Sequelize.STRING
+  ip: Sequelize.STRING
   upload_file_minidump: Sequelize.BLOB
 
 

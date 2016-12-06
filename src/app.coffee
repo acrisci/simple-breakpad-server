@@ -14,6 +14,7 @@ titleCase = require 'title-case'
 busboy = require 'connect-busboy'
 streamToArray = require 'stream-to-array'
 Sequelize = require 'sequelize'
+addr = require 'addr'
 
 crashreportToApiJson = (crashreport) ->
   json = crashreport.toJSON()
@@ -123,6 +124,11 @@ run = ->
   breakpad.post '/crashreports', (req, res, next) ->
     props = {}
     streamOps = []
+    # Get originating request address, respecting reverse proxies (e.g.
+    #   X-Forwarded-For header)
+    # Fixed list of just localhost as trusted reverse-proxy, we can add
+    #   a config option if needed
+    props.ip = addr(req, ['127.0.0.1', '::ffff:127.0.0.1'])
 
     req.busboy.on 'file', (fieldname, file, filename, encoding, mimetype) ->
       streamOps.push streamToArray(file).then((parts) ->
