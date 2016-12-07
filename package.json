@@ -16,6 +16,7 @@
     "serve": "grunt serve"
   },
   "dependencies": {
+    "addr": "^1.0.1",
     "body-parser": "^1.15.2",
     "bootstrap": "^3.3.7",
     "connect-busboy": "0.0.2",
