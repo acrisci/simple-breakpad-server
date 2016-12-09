@@ -105,11 +105,11 @@ database:
   storage: '/home/myuser/.simple-breakpad-server/database.sqlite'
   logging: false
 customFields:
-  files: ['customfile']
+  files:
+    - 'customfile1'
+    - name: 'customfile2'
+      downloadAs: 'customfile2.jpg'
   params: ['customparam']
-  extensions:
-    upload_file_minidump: '.dmp'
-    customfile: '.txt'
 dataDir: '/home/myuser/.simple-breakpad-server'
 ```
 
@@ -119,9 +119,9 @@ Database options are passed directly to [Sequelize](http://docs.sequelizejs.com/
 
 ### Custom Fields
 
-Place a list of file parameters in the `files` array. These will be stored in the database as blobs and can contain binary data. Non-files should go into the `params` array. These will be stored in the database encoded as strings.
+Place a list of file parameters in the `files` array. These will be stored in the database as blobs and can contain binary data. Non-files should go into the `params` array. These will be stored in the database encoded as strings.  File parameters can either be a simple string, or an object specifying a required `name` (used for upload and download url) and an optional `downloadAs` which specifies what name will be used when downloading.
 
-Custom `files` can be downloaded from the `GET /crashreports/<id>/files/<file>` endpoint and custom `params` will be shown on the main page for the crash report.  File downloads can be further customized with the `extensions` map, specifying what extension the downloaded file should have.  This can be especially useful with the `upload_file_minidump` field to set it to `.dmp` so that downloaded minidumps will open in Visual Studio or another appropriate debugger.
+Custom `files` can be downloaded from the `GET /crashreports/<id>/files/<file>` endpoint and custom `params` will be shown on the main page for the crash report.
 
 For now, if you change this configuration after the database is initialized, you will have to create the tables on your database manually for things to work.
 

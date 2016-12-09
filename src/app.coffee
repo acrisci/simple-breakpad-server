@@ -291,11 +291,9 @@ run = ->
       if not Buffer.isBuffer(contents)
         return res.status(404).send 'Crash report field is not a file'
 
-      customFields = config.get('customFields') || {}
-      extensions = customFields.extensions || {}
-      filename = "#{field}.#{req.params.id}"
-      if extensions[field]
-        filename += extensions[field]
+      # Find appropriate downloadAs file name
+      filename = config.get("customFields:filesById:#{field}:downloadAs") || field
+      filename = filename.replace('#{id}', req.params.id)
 
       res.setHeader('content-disposition', "attachment; filename=\"#{filename}\"");
       res.send(contents)

@@ -19,20 +19,17 @@ schema =
     primaryKey: yes
   product: Sequelize.STRING
   version: Sequelize.STRING
-  ip: Sequelize.STRING
-  upload_file_minidump: Sequelize.BLOB
-
 
 options =
   indexes: [
     { fields: ['created_at'] }
   ]
 
-for field in (customFields.params || [])
-  schema[field] = Sequelize.STRING
+for field in customFields.params
+  schema[field.name] = Sequelize.STRING
 
-for field in (customFields.files || [])
-  schema[field] = Sequelize.BLOB
+for field in customFields.files
+  schema[field.name] = Sequelize.BLOB
 
 Crashreport = sequelize.define('crashreports', schema, options)
 
