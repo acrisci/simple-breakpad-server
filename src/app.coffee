@@ -292,6 +292,20 @@ run = ->
 
       res.send(contents)
 
+  breakpad.get '/api/crashreports', (req, res, next) ->
+    # Query for a count of crash reports matching the requested query parameters
+    # e.g. /api/crashreports?version=1.2.3
+    where = {}
+    for name, value of Crashreport.attributes
+      unless value.type instanceof Sequelize.BLOB
+        if req.query[name]
+          where[name] = req.query[name]
+    Crashreport.count({ where }).then (result) ->
+      res.json
+        count: result
+    .error next
+
+
   breakpad.use(busboy())
   breakpad.post '/symfiles', (req, res, next) ->
     Symfile.createFromRequest req, (err, symfile) ->
