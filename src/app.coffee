@@ -295,7 +295,7 @@ run = ->
       filename = config.get("customFields:filesById:#{field}:downloadAs") || field
       filename = filename.replace('#{id}', req.params.id)
 
-      res.setHeader('content-disposition', "attachment; filename=\"#{filename}\"");
+      res.setHeader('content-disposition', "attachment; filename=\"#{filename}\"")
       res.send(contents)
 
   breakpad.use(busboy())
