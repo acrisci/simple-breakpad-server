@@ -12,6 +12,7 @@
     "crashreports"
   ],
   "scripts": {
+    "lint": "grunt lint",
     "prepublish": "grunt coffee",
     "serve": "grunt serve"
   },
