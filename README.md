@@ -106,9 +106,9 @@ database:
   logging: false
 customFields:
   files:
-    - 'customfile1'
+    - name: 'customfile1'
+      downloadAs: 'customfile1.jpg'
     - name: 'customfile2'
-      downloadAs: 'customfile2.jpg'
   params: ['customparam']
 dataDir: '/home/myuser/.simple-breakpad-server'
 ```
