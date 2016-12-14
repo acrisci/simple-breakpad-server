@@ -293,7 +293,7 @@ run = ->
 
       # Find appropriate downloadAs file name
       filename = config.get("customFields:filesById:#{field}:downloadAs") || field
-      filename = filename.replace('#{id}', req.params.id)
+      filename = filename.replace('{{id}}', req.params.id)
 
       res.setHeader('content-disposition', "attachment; filename=\"#{filename}\"")
       res.send(contents)

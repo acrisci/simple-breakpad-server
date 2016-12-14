@@ -44,7 +44,7 @@ customFields.files = customFields.files || []
 # Always add upload_file_minidump file as first file
 customFields.files.splice(0, 0,
   name: 'upload_file_minidump'
-  downloadAs: 'upload_file_minidump.#{id}.dmp'
+  downloadAs: 'upload_file_minidump.{{id}}.dmp'
 )
 # Ensure array members are objects and build lookup
 customFields.filesById = {}
