@@ -285,11 +285,17 @@ run = ->
       if not crashreport?
         return res.status(404).send 'Crash report not found'
 
-      contents = crashreport.get(req.params.filefield)
+      field = req.params.filefield
+      contents = crashreport.get(field)
 
       if not Buffer.isBuffer(contents)
         return res.status(404).send 'Crash report field is not a file'
 
+      # Find appropriate downloadAs file name
+      filename = config.get("customFields:filesById:#{field}:downloadAs") || field
+      filename = filename.replace('{{id}}', req.params.id)
+
+      res.setHeader('content-disposition', "attachment; filename=\"#{filename}\"")
       res.send(contents)
 
   breakpad.use(busboy())

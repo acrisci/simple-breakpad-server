@@ -105,7 +105,10 @@ database:
   storage: '/home/myuser/.simple-breakpad-server/database.sqlite'
   logging: false
 customFields:
-  files: ['customfile']
+  files:
+    - name: 'customfile1'
+      downloadAs: 'customfile1.jpg'
+    - name: 'customfile2'
   params: ['customparam']
 dataDir: '/home/myuser/.simple-breakpad-server'
 ```
@@ -116,7 +119,7 @@ Database options are passed directly to [Sequelize](http://docs.sequelizejs.com/
 
 ### Custom Fields
 
-The `customFields` member has two members. Place a list of file parameters in the `files` array. These will be stored in the database as blobs and can contain binary data. Non-files should go into the `params` array. These will be stored in the database encoded as strings.
+Place a list of file parameters in the `files` array. These will be stored in the database as blobs and can contain binary data. Non-files should go into the `params` array. These will be stored in the database encoded as strings.  File parameters can either be a simple string, or an object specifying a required `name` (used for upload and download url) and an optional `downloadAs` which specifies what name will be used when downloading.
 
 Custom `files` can be downloaded from the `GET /crashreports/<id>/files/<file>` endpoint and custom `params` will be shown on the main page for the crash report.
 
