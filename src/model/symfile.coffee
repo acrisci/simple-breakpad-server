@@ -49,7 +49,7 @@ Symfile.saveToDisk = (symfile) ->
     filePath = path.join(symfileDir, symbol_name)
     fs.writeFile(filePath, symfile.contents)
 
-Symfile.createFromRequest = (req, callback) ->
+Symfile.createFromRequest = (req, res, callback) ->
   props = {}
   streamOps = []
 
@@ -67,7 +67,7 @@ Symfile.createFromRequest = (req, callback) ->
 
   req.busboy.on 'finish', ->
     Promise.all(streamOps).then ->
-      if not 'symfile' of props
+      if not props.hasOwnProperty('symfile')
         res.status 400
         throw new Error 'Form must include a "symfile" field'
 

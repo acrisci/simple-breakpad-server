@@ -314,7 +314,7 @@ run = ->
 
   breakpad.use(busboy())
   breakpad.post '/symfiles', (req, res, next) ->
-    Symfile.createFromRequest req, (err, symfile) ->
+    Symfile.createFromRequest req, res, (err, symfile) ->
       return next(err) if err?
       symfileJson = symfile.toJSON()
       delete symfileJson.contents
