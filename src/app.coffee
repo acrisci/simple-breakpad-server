@@ -241,7 +241,7 @@ run = ->
   breakpad.get '/symfiles/:id', (req, res, next) ->
     Symfile.findById(req.params.id).then (symfile) ->
       if not symfile?
-        resturn res.send 404, 'Symfile not found'
+        return res.send 404, 'Symfile not found'
 
       if 'raw' of req.query
         res.set 'content-type', 'text/plain'
@@ -314,7 +314,7 @@ run = ->
 
   breakpad.use(busboy())
   breakpad.post '/symfiles', (req, res, next) ->
-    Symfile.createFromRequest req, (err, symfile) ->
+    Symfile.createFromRequest req, res, (err, symfile) ->
       return next(err) if err?
       symfileJson = symfile.toJSON()
       delete symfileJson.contents
