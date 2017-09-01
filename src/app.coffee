@@ -241,7 +241,7 @@ run = ->
   breakpad.get '/symfiles/:id', (req, res, next) ->
     Symfile.findById(req.params.id).then (symfile) ->
       if not symfile?
-        resturn res.send 404, 'Symfile not found'
+        return res.send 404, 'Symfile not found'
 
       if 'raw' of req.query
         res.set 'content-type', 'text/plain'
