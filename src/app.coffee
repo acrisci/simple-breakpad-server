@@ -15,6 +15,7 @@ busboy = require 'connect-busboy'
 streamToArray = require 'stream-to-array'
 Sequelize = require 'sequelize'
 addr = require 'addr'
+fs = require 'fs-promise'
 
 crashreportToApiJson = (crashreport) ->
   json = crashreport.toJSON()
@@ -31,16 +32,15 @@ crashreportToViewJson = (report) ->
     id: report.id
     props: {}
 
-  for name, value of Crashreport.attributes
-    if value.type instanceof Sequelize.BLOB
-      fields.props[name] = { path: "/crashreports/#{report.id}/files/#{name}" }
-
   json = report.toJSON()
   for k,v of json
     if k in hidden
       # pass
+    else if config.get("customFields:filesById:#{k}")
+      # a file
+      fields.props[k] = { path: "/crashreports/#{report.id}/files/#{k}" }
     else if Buffer.isBuffer(json[k])
-      # already handled
+      # shouldn't happen, should hit line above
     else if k == 'created_at'
       # change the name of this key for display purposes
       fields.props['created'] = moment(v).fromNow()
@@ -51,11 +51,11 @@ crashreportToViewJson = (report) ->
 
   return fields
 
-symfileToViewJson = (symfile) ->
+symfileToViewJson = (symfile, contents) ->
   hidden = ['id', 'updated_at', 'contents']
   fields =
     id: symfile.id
-    contents: symfile.contents
+    contents: contents
     props: {}
 
   json = symfile.toJSON()
@@ -77,7 +77,23 @@ symfileToViewJson = (symfile) ->
 db.sync()
   .then ->
     Symfile.findAll().then (symfiles) ->
-      Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s))).then(run)
+      pruneSymfilesFromDB = not config.get('filesInDatabase')
+      # TODO: This is really, really slow when you have a lot of symfiles, and
+      #   config.get('filesInDatabase') is true - only write those which do not
+      #   already exist on disk?  User can delete the on-disk cache if needed.
+      Promise.all(symfiles.map((s) -> Symfile.saveToDisk(s, pruneSymfilesFromDB)))
+  .then ->
+    console.log 'Symfile loading finished'
+    if Symfile.didPrune
+      # One-time vacuum of sqllite data to free up all of the data that was just deleted
+      console.log 'One-time compacting and syncing database after prune...'
+      db.query('VACUUM').then ->
+        db.sync().then ->
+          console.log 'Database compaction finished'
+    else
+      return
+  .then ->
+    run()
   .catch (err) ->
     console.error err.stack
     process.exit 1
@@ -120,7 +136,11 @@ run = ->
     console.trace err
     res.status(500).send "Bad things happened:<br/> #{err.message || err}"
 
-  breakpad.use(busboy())
+  breakpad.use(busboy(
+    limits:
+      fileSize: config.get 'fileMaxUploadSize'
+  ))
+  lastReportId = 0
   breakpad.post '/crashreports', (req, res, next) ->
     props = {}
     streamOps = []
@@ -129,18 +149,32 @@ run = ->
     # Fixed list of just localhost as trusted reverse-proxy, we can add
     #   a config option if needed
     props.ip = addr(req, ['127.0.0.1', '::ffff:127.0.0.1'])
+    reportUploadGuid = moment().format('YYYY-MM-DD.HH.mm.ss') + '.' +
+      process.pid + '.' + (++lastReportId)
 
     req.busboy.on 'file', (fieldname, file, filename, encoding, mimetype) ->
-      streamOps.push streamToArray(file).then((parts) ->
-        buffers = []
-        for i in [0 .. parts.length - 1]
-          part = parts[i]
-          buffers.push if part instanceof Buffer then part else new Buffer(part)
+      if config.get('filesInDatabase')
+        streamOps.push streamToArray(file).then((parts) ->
+          buffers = []
+          for i in [0 .. parts.length - 1]
+            part = parts[i]
+            buffers.push if part instanceof Buffer then part else
+              new Buffer(part)
 
-        return Buffer.concat(buffers)
-      ).then (buffer) ->
+          return Buffer.concat(buffers)
+        ).then (buffer) ->
+          if fieldname of Crashreport.attributes
+            props[fieldname] = buffer
+      else
+        # Stream file to disk, record filename in database
         if fieldname of Crashreport.attributes
-          props[fieldname] = buffer
+          saveFilename = path.join reportUploadGuid, fieldname
+          props[fieldname] = saveFilename
+          saveFilename = path.join config.getUploadPath(), saveFilename
+          fs.mkdirs(path.dirname(saveFilename)).then ->
+            file.pipe fs.createWriteStream(saveFilename)
+        else
+          file.close()
 
     req.busboy.on 'field', (fieldname, val, fieldnameTruncated, valTruncated) ->
       if fieldname == 'prod'
@@ -245,13 +279,18 @@ run = ->
 
       if 'raw' of req.query
         res.set 'content-type', 'text/plain'
-        res.send(symfile.contents.toString())
-        res.end()
+        if symfile.contents?
+          res.send(symfile.contents.toString())
+          res.end()
+        else
+          fs.createReadStream(Symfile.getPath(symfile)).pipe(res)
+
       else
-        res.render 'symfile-view', {
-          title: 'Symfile'
-          symfile: symfileToViewJson(symfile)
-        }
+        Symfile.getContents(symfile).then (contents) ->
+          res.render 'symfile-view', {
+            title: 'Symfile'
+            symfile: symfileToViewJson(symfile, contents)
+          }
 
   breakpad.get '/crashreports/:id', (req, res, next) ->
     Crashreport.findById(req.params.id).then (report) ->
@@ -281,19 +320,37 @@ run = ->
 
   breakpad.get '/crashreports/:id/files/:filefield', (req, res, next) ->
     # download the file for the given id
+    field = req.params.filefield
+    if !config.get("customFields:filesById:#{field}")
+      return res.status(404).send 'Crash report field is not a file'
+
     Crashreport.findById(req.params.id).then (crashreport) ->
       if not crashreport?
         return res.status(404).send 'Crash report not found'
 
-      field = req.params.filefield
       contents = crashreport.get(field)
-
-      if not Buffer.isBuffer(contents)
-        return res.status(404).send 'Crash report field is not a file'
 
       # Find appropriate downloadAs file name
       filename = config.get("customFields:filesById:#{field}:downloadAs") || field
       filename = filename.replace('{{id}}', req.params.id)
+
+      if !config.get('filesInDatabase')
+        # If this is a string, or a string stored as a blob in an old database,
+        # stream the on-disk file instead
+        onDiskFilename = contents
+        if Buffer.isBuffer(contents)
+          if contents.length > 128
+            # Large, must be an old actual dump stored in the database
+            onDiskFilename = null
+          else
+            onDiskFilename = contents.toString('utf8')
+        if onDiskFilename
+          # stream
+          res.setHeader('content-disposition', "attachment; filename=\"#{filename}\"")
+          return fs.createReadStream(path.join(config.getUploadPath(), onDiskFilename)).pipe(res)
+
+      if not Buffer.isBuffer(contents)
+        return res.status(404).send 'Crash report field is an unknown type'
 
       res.setHeader('content-disposition', "attachment; filename=\"#{filename}\"")
       res.send(contents)
