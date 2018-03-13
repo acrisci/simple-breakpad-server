@@ -111,6 +111,8 @@ customFields:
     - name: 'customfile2'
   params: ['customparam']
 dataDir: '/home/myuser/.simple-breakpad-server'
+fileMaxUploadSize: 100000000
+filesInDatabase: true
 ```
 
 ### Database configuration
@@ -128,6 +130,12 @@ For now, if you change this configuration after the database is initialized, you
 ### Data Directory
 
 Simple breakpad server caches symbols on the disk within the directory specified by `dataDir`. The default location is `$HOME/.simple-breakpad-server`.
+
+## Uploaded Files
+
+By default, there is no enforced limit to uploaded file size (limited by Node.js heap size and database size), and uploaded files (minidumps or custom files) are stored directly in the database.  The maximum allowed file size can be specified with `fileMaxUploadSize` (in bytes).
+
+The server can be directed to store all uploaded files on disk (instead of in the database) with `filesInDatabase: false`, however the dumps may be unable to be read after switching, so the database should be recreated (manually delete the `database.sqlite` file from your data directory).  Old symbols files (already on disk) should still work fine after changing this setting, even if they don't show up in the web interface's Symfiles list.  Note: if `filesInDatabase` is set to `false`, and you are doing backups, you should back up your entire data directory (or, at least, the symbols/ directory) in addition to your database file.
 
 ## Contributing
 

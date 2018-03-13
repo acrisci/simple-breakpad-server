@@ -35,19 +35,54 @@ options =
 
 Symfile = sequelize.define('symfiles', schema, options)
 
-Symfile.saveToDisk = (symfile) ->
+Symfile.getPath = (symfile) ->
   symfileDir = path.join(symbolsPath, symfile.name, symfile.code)
-  fs.mkdirs(symfileDir).then ->
-    # From https://chromium.googlesource.com/breakpad/breakpad/+/master/src/processor/simple_symbol_supplier.cc#179:
-    # Transform the debug file name into one ending in .sym.  If the existing
-    #   name ends in .pdb, strip the .pdb.  Otherwise, add .sym to the non-.pdb
-    #   name.
-    symbol_name = symfile.name
-    if path.extname(symbol_name).toLowerCase() == '.pdb'
-      symbol_name = symbol_name.slice(0, -4)
-    symbol_name += '.sym'
-    filePath = path.join(symfileDir, symbol_name)
-    fs.writeFile(filePath, symfile.contents)
+  # From https://chromium.googlesource.com/breakpad/breakpad/+/master/src/processor/simple_symbol_supplier.cc#179:
+  # Transform the debug file name into one ending in .sym.  If the existing
+  #   name ends in .pdb, strip the .pdb.  Otherwise, add .sym to the non-.pdb
+  #   name.
+  symbol_name = symfile.name
+  if path.extname(symbol_name).toLowerCase() == '.pdb'
+    symbol_name = symbol_name.slice(0, -4)
+  symbol_name += '.sym'
+  path.join(symfileDir, symbol_name)
+
+Symfile.saveToDisk = (symfile, prune) ->
+  filePath = Symfile.getPath(symfile)
+
+  # Note: this code will migrate symbol files between filesInDatabase: true/false,
+  #   or from an older version where filesInDatabase: true only referred to
+  #   dump files, however dump files have no similar migration - the database
+  #   must be wiped, so this is only actually useful for upgrading versions,
+  #   not switching between filesInDatabase modes, though it can be used
+  #   to import/export symbol files if you don't care about old dumps.
+
+  if not symfile.contents
+    if not prune
+      # If at startup, and the option was set back to "filesInDatabase", read them back from disk?
+      return fs.exists(filePath).then (exists) ->
+        if (exists)
+          console.log "Restoring contents to database from symfile #{symfile.id}, #{filePath}"
+          fs.readFile(filePath, 'utf8').then (contents) ->
+            Symfile.didPrune = true
+            Symfile.update({ contents: contents }, { where: { id: symfile.id }, fields: ['contents']})
+    else
+      # At startup, pruning, already no contents, great!
+      return
+
+  fs.mkdirs(path.dirname(filePath)).then ->
+    fs.writeFile(filePath, symfile.contents).then ->
+      if prune
+        console.log "Pruning contents from database for symfile #{symfile.id}, file saved at #{filePath}"
+        delete symfile.contents
+        Symfile.didPrune = true
+        Symfile.update({ contents: null }, { where: { id: symfile.id }, fields: ['contents']})
+
+Symfile.getContents = (symfile) ->
+  if config.get('filesInDatabase')
+    Promise.reslove(symfile.contents)
+  else
+    fs.readFile(Symfile.getPath(symfile), 'utf8')
 
 Symfile.createFromRequest = (req, res, callback) ->
   props = {}
@@ -98,8 +133,10 @@ Symfile.createFromRequest = (req, res, callback) ->
             else
               Promise.resolve()
           p.then ->
-            Symfile.create(props, {transaction: t}).then (symfile) ->
-              Symfile.saveToDisk(symfile).then ->
+            Symfile.saveToDisk(props, false).then ->
+              if not config.get('filesInDatabase')
+                delete props.contents
+              Symfile.create(props, {transaction: t}).then (symfile) ->
                 cache.clear()
                 callback(null, symfile)
 

@@ -35,6 +35,8 @@ nconf.defaults
     files: []
     params: []
   dataDir: SBS_HOME
+  filesInDatabase: true
+  fileMaxUploadSize: Infinity
 
 # Post-process custom files and params
 customFields = nconf.get('customFields')
@@ -71,6 +73,7 @@ for field, idx in customFields.params
 nconf.set('customFields', customFields)
 
 nconf.getSymbolsPath = -> path.join(nconf.get('dataDir'), 'symbols')
+nconf.getUploadPath = -> path.join(nconf.get('dataDir'), 'uploads')
 
 fs.mkdirsSync(nconf.getSymbolsPath())
 
