@@ -80,7 +80,7 @@ Symfile.saveToDisk = (symfile, prune) ->
 
 Symfile.getContents = (symfile) ->
   if config.get('filesInDatabase')
-    Promise.reslove(symfile.contents)
+    Promise.resolve(symfile.contents)
   else
     fs.readFile(Symfile.getPath(symfile), 'utf8')
 
