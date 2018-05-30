@@ -238,7 +238,6 @@ run = ->
           page: page
           pageCount: pageCount
 
-  breakpad.use paginate.middleware(10, 50)
   breakpad.get '/symfiles', (req, res, next) ->
     limit = req.query.limit
     offset = req.offset
