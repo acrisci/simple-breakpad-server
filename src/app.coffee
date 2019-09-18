@@ -112,6 +112,7 @@ run = ->
       symfileUrl: (id) -> "/symfiles/#{id}"
       titleCase: titleCase
 
+  breakpad.use(require('express-decompress').create());
   breakpad.set 'json spaces', 2
   breakpad.set 'views', path.resolve(__dirname, '..', 'views')
   breakpad.engine('handlebars', hbs.engine)
