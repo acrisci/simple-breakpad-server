@@ -36,7 +36,7 @@
     "pg": "^6.1.0",
     "pg-hstore": "^2.3.2",
     "sequelize": "^3.27.0",
-    "sqlite3": "^4.1.0",
+    "sqlite3": "^5.0.2",
     "stream-to-array": "^2.3.0",
     "title-case": "^2.1.0",
     "tmp": "^0.0.30"
