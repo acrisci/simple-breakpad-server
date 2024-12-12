@@ -17,6 +17,7 @@
     "serve": "grunt serve"
   },
   "dependencies": {
+    "@jimbly/minidump": "^0.0.6",
     "addr": "^1.0.1",
     "body-parser": "^1.19.0",
     "bootstrap": "^3.3.7",
@@ -28,7 +29,6 @@
     "fs-promise": "^1.0.0",
     "handlebars-paginate": "^0.1.0",
     "method-override": "^2.3.6",
-    "minidump": "^0.11.0",
     "moment": "^2.16.0",
     "mysql": "^2.12.0",
     "nconf": "^0.8.4",
