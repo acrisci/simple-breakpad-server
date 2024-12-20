@@ -49,6 +49,7 @@
     "grunt-contrib-coffee": "^2.1.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-express-server": "^0.5.3",
+    "grunt-shell": "^3.0.1",
     "rimraf": "^2.5.4"
   },
   "repository": {
