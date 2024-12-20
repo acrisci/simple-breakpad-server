@@ -300,6 +300,9 @@ run = ->
       if not report?
         return res.send 404, 'Crash report not found'
       Crashreport.getStackTrace report, (err, stackwalk) ->
+        if err
+          stackwalk = err.stack || err
+          err = null
         return next err if err?
         fields = crashreportToViewJson(report).props
 
