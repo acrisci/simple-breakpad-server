@@ -17,10 +17,11 @@
     "serve": "grunt serve"
   },
   "dependencies": {
+    "@jimbly/minidump": "^0.0.6",
     "addr": "^1.0.1",
     "body-parser": "^1.19.0",
     "bootstrap": "^3.3.7",
-    "connect-busboy": "0.0.2",
+    "connect-busboy": "^1.0.0",
     "express": "^4.17.1",
     "express-decompress": "0.0.2",
     "express-handlebars": "^3.1.0",
@@ -28,7 +29,6 @@
     "fs-promise": "^1.0.0",
     "handlebars-paginate": "^0.1.0",
     "method-override": "^2.3.6",
-    "minidump": "^0.11.0",
     "moment": "^2.16.0",
     "mysql": "^2.12.0",
     "nconf": "^0.8.4",
@@ -36,7 +36,7 @@
     "pg": "^6.1.0",
     "pg-hstore": "^2.3.2",
     "sequelize": "^3.27.0",
-    "sqlite3": "^4.1.0",
+    "sqlite3": "^5.0.2",
     "stream-to-array": "^2.3.0",
     "title-case": "^2.1.0",
     "tmp": "^0.0.30"
@@ -49,6 +49,7 @@
     "grunt-contrib-coffee": "^2.1.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-express-server": "^0.5.3",
+    "grunt-shell": "^3.0.1",
     "rimraf": "^2.5.4"
   },
   "repository": {

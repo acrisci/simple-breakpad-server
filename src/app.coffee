@@ -134,7 +134,10 @@ run = ->
     if not err.message?
       console.log 'warning: error thrown without a message'
 
-    console.trace err
+    if err.stack
+      console.error err
+    else
+      console.trace err
     res.status(500).send "Bad things happened:<br/> #{err.message || err}"
 
   breakpad.use(busboy(
@@ -297,6 +300,9 @@ run = ->
       if not report?
         return res.send 404, 'Crash report not found'
       Crashreport.getStackTrace report, (err, stackwalk) ->
+        if err
+          stackwalk = err.stack || err
+          err = null
         return next err if err?
         fields = crashreportToViewJson(report).props
 
