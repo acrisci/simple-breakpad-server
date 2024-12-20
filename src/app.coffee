@@ -27,7 +27,7 @@ crashreportToApiJson = (crashreport) ->
   json
 
 crashreportToViewJson = (report) ->
-  hidden = ['id', 'updated_at']
+  hidden = ['id', 'updatedAt']
   fields =
     id: report.id
     props: {}
@@ -41,7 +41,7 @@ crashreportToViewJson = (report) ->
       fields.props[k] = { path: "/crashreports/#{report.id}/files/#{k}" }
     else if Buffer.isBuffer(json[k])
       # shouldn't happen, should hit line above
-    else if k == 'created_at'
+    else if k == 'createdAt'
       # change the name of this key for display purposes
       fields.props['created'] = moment(v).fromNow()
     else if v instanceof Date
@@ -55,7 +55,7 @@ crashreportToViewJson = (report) ->
   return fields
 
 symfileToViewJson = (symfile, contents) ->
-  hidden = ['id', 'updated_at', 'contents']
+  hidden = ['id', 'updatedAt', 'contents']
   fields =
     id: symfile.id
     contents: contents
@@ -66,7 +66,7 @@ symfileToViewJson = (symfile, contents) ->
   for k,v of json
     if k in hidden
       # pass
-    else if k == 'created_at'
+    else if k == 'createdAt'
       # change the name of this key for display purposes
       fields.props['created'] = moment(v).fromNow()
     else if v instanceof Date
@@ -170,11 +170,11 @@ run = ->
 
           return Buffer.concat(buffers)
         ).then (buffer) ->
-          if fieldname of Crashreport.attributes
+          if fieldname of Crashreport.getAttributes()
             props[fieldname] = buffer
       else
         # Stream file to disk, record filename in database
-        if fieldname of Crashreport.attributes
+        if fieldname of Crashreport.getAttributes()
           saveFilename = path.join reportUploadGuid, fieldname
           props[fieldname] = saveFilename
           saveFilename = path.join config.getUploadPath(), saveFilename
@@ -188,7 +188,7 @@ run = ->
         props['product'] = val
       else if fieldname == 'ver'
         props['version'] = val
-      else if fieldname of Crashreport.attributes
+      else if fieldname of Crashreport.getAttributes()
         props[fieldname] = val.toString()
 
     req.busboy.on 'finish', ->
@@ -212,12 +212,12 @@ run = ->
     attributes = []
 
     # only fetch non-blob attributes to speed up the query
-    for name, value of Crashreport.attributes
+    for name, value of Crashreport.getAttributes()
       unless value.type instanceof Sequelize.BLOB
         attributes.push name
 
     findAllQuery =
-      order: 'created_at DESC'
+      order: [['created_at', 'DESC']]
       limit: limit
       offset: offset
       attributes: attributes
@@ -251,7 +251,7 @@ run = ->
     page = req.query.page
 
     findAllQuery =
-      order: 'created_at DESC'
+      order: [['created_at', 'DESC']]
       limit: limit
       offset: offset
 
@@ -279,7 +279,7 @@ run = ->
           pageCount: pageCount
 
   breakpad.get '/symfiles/:id', (req, res, next) ->
-    Symfile.findById(req.params.id).then (symfile) ->
+    Symfile.findByPk(req.params.id).then (symfile) ->
       if not symfile?
         return res.send 404, 'Symfile not found'
 
@@ -299,7 +299,7 @@ run = ->
           }
 
   breakpad.get '/crashreports/:id', (req, res, next) ->
-    Crashreport.findById(req.params.id).then (report) ->
+    Crashreport.findByPk(req.params.id).then (report) ->
       if not report?
         return res.send 404, 'Crash report not found'
       Crashreport.getStackTrace report, (err, stackwalk) ->
@@ -319,7 +319,7 @@ run = ->
 
   breakpad.get '/crashreports/:id/stackwalk', (req, res, next) ->
     # give the raw stackwalk
-    Crashreport.findById(req.params.id).then (report) ->
+    Crashreport.findByPk(req.params.id).then (report) ->
       if not report?
         return res.send 404, 'Crash report not found'
       Crashreport.getStackTrace report, (err, stackwalk) ->
@@ -333,7 +333,7 @@ run = ->
     if !config.get("customFields:filesById:#{field}")
       return res.status(404).send 'Crash report field is not a file'
 
-    Crashreport.findById(req.params.id).then (crashreport) ->
+    Crashreport.findByPk(req.params.id).then (crashreport) ->
       if not crashreport?
         return res.status(404).send 'Crash report not found'
 
@@ -368,7 +368,7 @@ run = ->
     # Query for a count of crash reports matching the requested query parameters
     # e.g. /api/crashreports?version=1.2.3
     where = {}
-    for name, value of Crashreport.attributes
+    for name, value of Crashreport.getAttributes()
       unless value.type instanceof Sequelize.BLOB
         if req.query[name]
           where[name] = req.query[name]
