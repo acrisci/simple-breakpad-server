@@ -49,6 +49,9 @@ crashreportToViewJson = (report) ->
     else
       fields.props[k] = if v? then v else 'not present'
 
+  if !fields.props.upload_file_minidump
+    fields.props.upload_file_minidump = { path: "/crashreports/#{report.id}/files/upload_file_minidump" }
+
   return fields
 
 symfileToViewJson = (symfile, contents) ->
