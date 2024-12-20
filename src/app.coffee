@@ -134,7 +134,10 @@ run = ->
     if not err.message?
       console.log 'warning: error thrown without a message'
 
-    console.trace err
+    if err.stack
+      console.error err
+    else
+      console.trace err
     res.status(500).send "Bad things happened:<br/> #{err.message || err}"
 
   breakpad.use(busboy(
