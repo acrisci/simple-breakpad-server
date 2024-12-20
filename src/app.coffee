@@ -375,7 +375,7 @@ run = ->
     Crashreport.count({ where }).then (result) ->
       res.json
         count: result
-    .error next
+    .catch next
 
 
   breakpad.use(busboy())
