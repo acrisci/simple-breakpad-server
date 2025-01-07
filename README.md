@@ -110,6 +110,7 @@ customFields:
       downloadAs: 'customfile1.jpg'
     - name: 'customfile2'
   params: ['customparam']
+  hide: ['customparam']
 extraField: 'details'
 dataDir: '/home/myuser/.simple-breakpad-server'
 fileMaxUploadSize: 100000000
@@ -126,7 +127,10 @@ Place a list of file parameters in the `files` array. These will be stored in th
 
 Custom `files` can be downloaded from the `GET /crashreports/<id>/files/<file>` endpoint and custom `params` will be shown on the main page for the crash report.
 
+
 If you specify an `extraField`, then any fields posted with the crash report which are not a known field or a custom field will be gathered up into a single record and stored as JSON in this field.  This is especially useful for accepting crash reports from Electron apps which provide additional details in a handful of extra fields.
+
+Custom fields listed in `hide` will not be shown on the Crash Reports summary page (only show when viewing individual crash reports), useful for `extraField` or other noisy fields that are only used when investigating a particular crash.
 
 If you change this configuration after the database is initialized, sequelize will attempt to update the database definition, but if you encounter errors you may have to recreate the database or create the new columns on your database manually for things to work.
 

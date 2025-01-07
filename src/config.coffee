@@ -34,6 +34,7 @@ nconf.defaults
   customFields:
     files: []
     params: []
+    hide: []
   extraField: null
   dataDir: SBS_HOME
   filesInDatabase: true

@@ -26,8 +26,10 @@ crashreportToApiJson = (crashreport) ->
 
   json
 
-crashreportToViewJson = (report) ->
+crashreportToViewJson = (exclude_hidden, report) ->
   hidden = ['id', 'updatedAt']
+  if exclude_hidden
+    hidden = hidden.concat(config.get('customFields:hide'))
   fields =
     id: report.id
     props: {}
@@ -231,7 +233,7 @@ run = ->
       count = q.count
       pageCount = Math.ceil(count / limit)
 
-      viewReports = records.map(crashreportToViewJson)
+      viewReports = records.map(crashreportToViewJson.bind(null, true))
 
       fields =
         if viewReports.length
@@ -311,7 +313,7 @@ run = ->
           stackwalk = err.stack || err
           err = null
         return next err if err?
-        fields = crashreportToViewJson(report).props
+        fields = crashreportToViewJson(false, report).props
 
         res.render 'crashreport-view', {
           title: 'Crash Report'
