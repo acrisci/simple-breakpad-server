@@ -110,6 +110,7 @@ customFields:
       downloadAs: 'customfile1.jpg'
     - name: 'customfile2'
   params: ['customparam']
+extraField: 'details'
 dataDir: '/home/myuser/.simple-breakpad-server'
 fileMaxUploadSize: 100000000
 filesInDatabase: true
@@ -124,6 +125,8 @@ Database options are passed directly to [Sequelize](http://docs.sequelizejs.com/
 Place a list of file parameters in the `files` array. These will be stored in the database as blobs and can contain binary data. Non-files should go into the `params` array. These will be stored in the database encoded as strings.  File parameters can either be a simple string, or an object specifying a required `name` (used for upload and download url) and an optional `downloadAs` which specifies what name will be used when downloading.
 
 Custom `files` can be downloaded from the `GET /crashreports/<id>/files/<file>` endpoint and custom `params` will be shown on the main page for the crash report.
+
+If you specify an `extraField`, then any fields posted with the crash report which are not a known field or a custom field will be gathered up into a single record and stored as JSON in this field.  This is especially useful for accepting crash reports from Electron apps which provide additional details in a handful of extra fields.
 
 For now, if you change this configuration after the database is initialized, you will have to create the tables on your database manually for things to work.
 

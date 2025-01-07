@@ -34,6 +34,7 @@ nconf.defaults
   customFields:
     files: []
     params: []
+  extraField: null
   dataDir: SBS_HOME
   filesInDatabase: true
   fileMaxUploadSize: Infinity
@@ -48,6 +49,11 @@ customFields.files.splice(0, 0,
   name: 'upload_file_minidump'
   downloadAs: 'upload_file_minidump.{{id}}.dmp'
 )
+# If extraField is specified, ensure it's also in customField.params
+extraField = nconf.get('extraField')
+if typeof extraField is 'string'
+  if customFields.params.indexOf(extraField) == -1
+    customFields.params.push(extraField)
 # Ensure array members are objects and build lookup
 customFields.filesById = {}
 for field, idx in customFields.files

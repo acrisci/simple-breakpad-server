@@ -183,6 +183,7 @@ run = ->
         else
           file.close()
 
+    extraFields = {}
     req.busboy.on 'field', (fieldname, val, fieldnameTruncated, valTruncated) ->
       if fieldname == 'prod'
         props['product'] = val
@@ -190,6 +191,9 @@ run = ->
         props['version'] = val
       else if fieldname of Crashreport.getAttributes()
         props[fieldname] = val.toString()
+      else if config.get("extraField")
+        extraFields[fieldname] = val.toString()
+        props[config.get("extraField")] = JSON.stringify(extraFields)
 
     req.busboy.on 'finish', ->
       Promise.all(streamOps).then ->
