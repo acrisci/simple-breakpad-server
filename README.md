@@ -128,7 +128,7 @@ Custom `files` can be downloaded from the `GET /crashreports/<id>/files/<file>` 
 
 If you specify an `extraField`, then any fields posted with the crash report which are not a known field or a custom field will be gathered up into a single record and stored as JSON in this field.  This is especially useful for accepting crash reports from Electron apps which provide additional details in a handful of extra fields.
 
-For now, if you change this configuration after the database is initialized, you will have to create the tables on your database manually for things to work.
+If you change this configuration after the database is initialized, sequelize will attempt to update the database definition, but if you encounter errors you may have to recreate the database or create the new columns on your database manually for things to work.
 
 ### Data Directory
 
