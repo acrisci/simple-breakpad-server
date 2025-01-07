@@ -33,7 +33,9 @@ for field in customFields.files
 
 Crashreport = sequelize.define('crashreports', schema, options)
 
-Crashreport.sync({ alter: { drop: false } })
+# Do an arbitrary query to ensure the async init in sequelize.define() has finished before sync'ing
+Crashreport.count().then () ->
+  Crashreport.sync({ alter: { drop: false } })
 
 Crashreport.getStackTrace = (record, callback) ->
   return callback(null, cache.get(record.id)) if cache.has record.id
