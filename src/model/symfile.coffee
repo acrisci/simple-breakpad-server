@@ -98,7 +98,7 @@ Symfile.createFromRequest = (req, res, callback) ->
       return Buffer.concat(buffers)
     ).then (buffer) ->
       if fieldname == 'symfile'
-        props[fieldname] = buffer.toString()
+        props[fieldname] = buffer
 
   req.busboy.on 'finish', ->
     Promise.all(streamOps).then ->
@@ -107,7 +107,7 @@ Symfile.createFromRequest = (req, res, callback) ->
         throw new Error 'Form must include a "symfile" field'
 
       contents = props.symfile
-      header = contents.split('\n')[0].match(/^(MODULE) ([^ ]+) ([^ ]+) ([0-9A-Fa-f]+) (.*)/)
+      header = contents.toString('utf8', 0, 4096).split('\n')[0].match(/^(MODULE) ([^ ]+) ([^ ]+) ([0-9A-Fa-f]+) (.*)/)
 
       [line, dec, os, arch, code, name] = header
 
