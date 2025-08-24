@@ -43,7 +43,7 @@
     "sqlite3": "^5.0.2",
     "stream-to-array": "^2.3.0",
     "title-case": "^2.1.0",
-    "tmp": "^0.0.30"
+    "tmp": "^0.2.4"
   },
   "devDependencies": {
     "coffee-script": "^1.11.1",
