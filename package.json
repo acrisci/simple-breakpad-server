@@ -24,7 +24,7 @@
     "@jimbly/minidump": "^0.0.6",
     "addr": "^1.0.1",
     "body-parser": "^1.19.0",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "^5.0.0",
     "connect-busboy": "^1.0.0",
     "express": "^4.17.1",
     "express-decompress": "0.0.2",
